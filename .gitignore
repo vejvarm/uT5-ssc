@@ -1,0 +1,20 @@
+# cache
+.cache
+__pycache__
+
+# Environments
+.venv
+.conda
+
+
+# Modelling artifacts
+train/*
+eval/*
+transformers_cache/*
+wandb/*
+database/*
+
+results/
+logs/
+plot_outputs/
+pretraining/
