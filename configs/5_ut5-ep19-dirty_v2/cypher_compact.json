@@ -13,7 +13,7 @@
     "lowercase_query": true,
     "capitalize_query": false,
     "target_with_db_id": false,
-    "output_dir": "./results/ut5-base/ssc/dirty_v2/ep19/cypher/schema/compact",
+    "output_dir": "/work/results/ut5-base/Spider4SSC/dirty_v2/ep19/cypher/schema/compact",
     "do_train": true,
     "do_eval": true,
     "fp16": false,

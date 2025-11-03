@@ -78,7 +78,6 @@ def main() -> None:
 
 
     combined_args_dict = {
-        **asdict(picard_args),
         **asdict(model_args),
         **asdict(data_args),
         **asdict(data_training_args),

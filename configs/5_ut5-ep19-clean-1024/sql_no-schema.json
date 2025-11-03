@@ -17,7 +17,7 @@
     "lowercase_query": true,
     "capitalize_query": false,
     "target_with_db_id": false,
-    "output_dir": "/work/results/ut5-base/Spider4SSC/clean/ep19/1024/sql/no_schema",
+    "output_dir": "/work/results/ut5-base/Spider4SSC/clean/ep19/single/1024/sql/no_schema",
     "do_train": true,
     "do_eval": true,
     "fp16": false,
