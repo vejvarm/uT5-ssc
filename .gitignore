@@ -2,9 +2,11 @@
 .cache
 __pycache__
 
+
 # Environments
 .venv
 .conda
+.vscode
 
 
 # Modelling artifacts
