@@ -1,7 +1,7 @@
 import pathlib
 
 # Root folder where results are stored
-BASE_DIR = pathlib.Path("~/git/uT5-fine-tuning")
+BASE_DIR = pathlib.Path("~/git/uT5-ssc")
 RESULTS_DIR = BASE_DIR.joinpath("results")
 PLOT_OUTPUT_DIR = BASE_DIR.joinpath("plot_outputs")
 PLOT_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

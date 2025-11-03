@@ -1,4 +1,4 @@
-cd ~/git/uT5-fine-tuning
+cd ~/git/uT5-ssc
 source ~/miniconda3/bin/activate ./.conda
 
 rm -rf .cache/spider_ssc_sql
@@ -30,8 +30,8 @@ rm -rf .cache/spider_ssc_cypher
 #     graphstack/dozerdb:5.20.0.0-alpha.1
 
 # # Populate databases
-# python seq2seq/serve_rdf4j_graphs.py ~/git/uT5-fine-tuning/.cache/downloads/extracted/c702c18c8d855b7bc0a53f5b230cd5314a83d607fea4df3ad5612a557fae3dd2/Spider4SSC --split dev
-# python seq2seq/serve_neo4j_graphs.py ~/git/uT5-fine-tuning/.cache/downloads/extracted/c702c18c8d855b7bc0a53f5b230cd5314a83d607fea4df3ad5612a557fae3dd2/Spider4SSC --split dev
+# python seq2seq/serve_rdf4j_graphs.py ~/git/uT5-ssc/.cache/downloads/extracted/c702c18c8d855b7bc0a53f5b230cd5314a83d607fea4df3ad5612a557fae3dd2/Spider4SSC --split dev
+# python seq2seq/serve_neo4j_graphs.py ~/git/uT5-ssc/.cache/downloads/extracted/c702c18c8d855b7bc0a53f5b230cd5314a83d607fea4df3ad5612a557fae3dd2/Spider4SSC --split dev
 
 # ______________________
 

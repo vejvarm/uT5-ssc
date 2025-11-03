@@ -344,7 +344,7 @@ if __name__ == "__main__":
     password = "secretserver"
     database = "concert_singer"
     restructure = True  # Restructure and clean schema
-    db_root = pathlib.Path("~/git/uT5-fine-tuning/.cache/downloads/extracted/c702c18c8d855b7bc0a53f5b230cd5314a83d607fea4df3ad5612a557fae3dd2/Spider4SSC/database")
+    db_root = pathlib.Path("~/git/uT5-ssc/.cache/downloads/extracted/c702c18c8d855b7bc0a53f5b230cd5314a83d607fea4df3ad5612a557fae3dd2/Spider4SSC/database")
     extractor = Neo4jSchemaExtractor(uri, user, password, db_root=db_root)
     schema = extractor.extract_schema(database, restructure=restructure, dump=True, overwrite=True)
 

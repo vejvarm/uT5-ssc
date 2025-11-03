@@ -45,7 +45,6 @@
     "evaluation_strategy": "steps",
     "eval_steps": 100,
     "cache_dir": "./.cache",
-    "resume_from_checkpoint": false,
-    "trust_remote_code": true,
-    "overwrite_output_dir": true
+    "resume_from_checkpoint": true,
+    "trust_remote_code": true
 }

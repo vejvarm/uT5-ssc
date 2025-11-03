@@ -1,6 +1,6 @@
 {
     "run_name": "t5-base_Cypher-no-schema",
-    "model_name_or_path": "~/git/uT5-fine-tuning/results/t5-base/ssc/joint/no_schema/trainer_state.json",
+    "model_name_or_path": "~/git/uT5-ssc/results/t5-base/ssc/joint/no_schema/trainer_state.json",
     "dataset": "spider_ssc_cypher",
     "metric_config": "test_suite",
     "source_prefix": "lang_name",

@@ -110,7 +110,7 @@ def load_dataset(
     )    
 
     _spider_ssc_sparql_dataset_dict : Callable[[], DatasetDict] = lambda: datasets.load.load_dataset(
-        path=data_args.dataset_paths['spider_ssc_sparql'], cache_dir=model_args.cache_dir, trust_remote_code=data_args.trust_remote_code
+        path=data_args.dataset_paths['spider_ssc_sparql'], cache_dir=model_args.cache_dir, trust_remote_code=data_args.trust_remote_code, download_mode="reuse_dataset_if_exists"
     )
     _spider_ssc_sparql_metric: Callable[[], Metric] = lambda: evaluate.load(
         path=data_args.metric_paths["spider_ssc_sparql"], config_name=data_args.metric_config, test_suite_db_dir=data_args.test_suite_db_dir
