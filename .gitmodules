@@ -1,9 +1,9 @@
 [submodule "third_party/spider"]
 	path = third_party/spider
-	url = https://github.com/elementai/spider
+	url = https://github.com/vejvarm/spider
 [submodule "third_party/test_suite"]
 	path = third_party/test_suite
-	url = https://github.com/elementai/test-suite-sql-eval
+	url = https://github.com/vejvarm/test-suite-sql-eval
 [submodule "third_party/tokenizers"]
 	path = third_party/tokenizers
-	url = https://github.com/hasktorch/tokenizers
+	url = https://github.com/vejvarm/tokenizers
