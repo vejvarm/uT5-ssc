@@ -39,6 +39,7 @@
     "save_steps": 64,
     "evaluation_strategy": "steps",
     "eval_steps": 16,
+    "predict_with_generate": true,
     "cache_dir": "./.cache",
     "resume_from_checkpoint": true,
     "trust_remote_code": true

@@ -1,7 +1,7 @@
 {
     "run_name": "ut5-base_pt-ep19_clean_ft-Cypher-norange",
     "model_name_or_path": "/work/results/ut5-base/Spider4SSC/clean/ep19/single/cypher/schema/norange",
-    "devices": "1",
+    "devices": "0,1",
     "dataset": "spider_ssc_cypher",
     "metric_config": "test_suite",
     "source_prefix": "lang_name",
@@ -40,6 +40,7 @@
     "save_steps": 64,
     "evaluation_strategy": "steps",
     "eval_steps": 16,
+    "predict_with_generate": true,
     "cache_dir": "./.cache",
     "overwrite_output_dir": true,
     "trust_remote_code": true
