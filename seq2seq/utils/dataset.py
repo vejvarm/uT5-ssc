@@ -314,15 +314,16 @@ def _prepare_eval_split(
         eval_examples = dataset.select(range(data_training_args.max_val_samples))
     else:
         eval_examples = dataset
-    schemas = _get_schemas(examples=eval_examples)
-    eval_dataset = eval_examples.map(
+
+    eval_examples = eval_examples.map(
         add_serialized_schema,
         batched=False,
         num_proc=data_training_args.preprocessing_num_workers,
         load_from_cache_file=not data_training_args.overwrite_cache,
     )
-    column_names = eval_dataset.column_names
-    eval_dataset = eval_dataset.map(
+    schemas = _get_schemas(examples=eval_examples)
+    column_names = eval_examples.column_names
+    eval_dataset = eval_examples.map(
         lambda batch: pre_process_function(
             batch=batch,
             max_source_length=data_training_args.max_source_length,

@@ -240,10 +240,30 @@ class IdentifierMapping:
                 raise ValueError(f"Invalid identifier mapping payload for context `{ctx}`: length mismatch.")
             forward_by_context[ctx] = dict(zip(originals, shorts))
 
-        collisions_payload = {
-            ctx: [tuple(item) for item in collisions]
-            for ctx, collisions in data.get("collisions", {}).items()
-        }
+        collisions_payload: Dict[str, List[Tuple[str, str]]] = {}
+        collision_data = data.get("collisions", {})
+        if collision_data is None:
+            return cls(forward_by_context=forward_by_context, collisions_by_context=collisions_payload)
+        
+        if isinstance(collision_data, dict):
+            for ctx, collisions in collision_data.items():
+                normalized: List[Tuple[str, str]] = []
+                if collisions is None:
+                    continue
+                for item in collisions:
+                    if isinstance(item, dict):
+                        original = item.get("original")
+                        short = item.get("short")
+                        if original is None or short is None:
+                            raise ValueError(f"Invalid collision payload for context `{ctx}`: missing `original` or `short`.")
+                        normalized.append((original, short))
+                    elif isinstance(item, (list, tuple)) and len(item) == 2:
+                        original, short = item
+                        normalized.append((str(original), str(short)))
+                    else:
+                        raise ValueError(f"Invalid collision payload for context `{ctx}`: {item!r}")
+                collisions_payload[ctx] = normalized
+
         return cls(forward_by_context=forward_by_context, collisions_by_context=collisions_payload)
 
 
