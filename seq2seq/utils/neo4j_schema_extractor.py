@@ -235,16 +235,13 @@ def serialize_schema_compactly(schema: dict, prefix: str = None, shuffle: bool =
 
     # Process NodeProperties
     for node_label in schema["NodeLabels"]:
+        class_name = node_label[len(prefix):] if prefix and node_label.startswith(prefix) else node_label
+        class_representation = f"{class_name}: "
         property_reprs = []
         # Collect node properties
         for entry in schema["NodeProperties"]:
             if node_label != entry["nodeName"]:
                 continue 
-
-            # Optionally remove prefix
-            class_name = node_label[len(prefix):] if prefix and node_label.startswith(prefix) else node_label
-            class_representation = f"{class_name}: "
-
             prop_name = entry["propertyName"]
             prop_type = entry["propertyTypes"][0] if entry["propertyTypes"] else "Unknown"
             if prefix and prop_name.startswith(prefix):

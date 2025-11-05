@@ -11,6 +11,11 @@ from seq2seq.utils.dataset import DataArguments, DataTrainingArguments, normaliz
 from seq2seq.utils.helpers import log
 from seq2seq.utils.rdf_schema_extractor import serialize_sparql_schema
 from seq2seq.utils.neo4j_schema_extractor import serialize_cypher_schema
+from seq2seq.utils.cypher_identifier_mapping import (
+    CypherIdentifierMappingBuilder,
+    IdentifierMapping,
+    normalize_cypher_schema,
+)
 from seq2seq.utils.trainer import Seq2SeqTrainer, EvalPrediction
 
 from seq2seq.utils.helpers import replace_custom_datatypes
@@ -44,7 +49,7 @@ def spider_get_target(
 
 
 def spider_add_serialized_schema(ex: dict, data_args: DataArguments, data_training_args: DataTrainingArguments) -> dict:
-    
+    result: dict = {}
     lang = ex.get("lang", data_args.dataset) 
     if "sparql" in lang:
         serialized_schema = serialize_sparql_schema(
@@ -61,18 +66,42 @@ def spider_add_serialized_schema(ex: dict, data_args: DataArguments, data_traini
             prefix=data_args.sparql_prefix_default
         )
     elif "cypher" in lang:
+        normalized_schema = normalize_cypher_schema(ex, 
+                                                    data_training_args.cypher_remove_uri_from_schema, 
+                                                    data_training_args.cypher_remove_foreign_key_attributes_from_schema)
         serialized_schema = serialize_cypher_schema(
             question=ex["question"],
             db_path=ex["db_path"],
             db_id=ex["db_id"],
-            schema=ex,
+            schema=normalized_schema,
             schema_serialization_type=data_training_args.schema_serialization_type,
             schema_serialization_randomized=data_training_args.schema_serialization_randomized,
             schema_serialization_with_db_id=data_training_args.schema_serialization_with_db_id,
             schema_serialization_with_db_content=data_training_args.schema_serialization_with_db_content,
             normalize_query=data_training_args.normalize_query,
             prefix=data_args.cypher_prefix_default
-        ) 
+        )
+        mapping_builder = CypherIdentifierMappingBuilder(
+            keep_collisions=data_training_args.cypher_identifier_mapping_keep_collisions
+        )
+        identifier_mapping = mapping_builder.build(
+            schema=normalized_schema,
+            strategy=data_training_args.cypher_identifier_mapping_strategy,
+        )
+        serialized_schema = identifier_mapping.shorten_schema(serialized_schema)
+        query_short = identifier_mapping.shorten_query(ex["query"])
+        mapping_payload = identifier_mapping.to_serializable()
+        collision_payload = {
+            ctx: [{"original": original, "short": short} for original, short in collisions]
+            for ctx, collisions in identifier_mapping.collisions_by_context.items()
+            if collisions
+        }
+        result.update({
+            "serialized_schema": serialized_schema,
+            "query_short": query_short,
+            "cypher_identifier_map": mapping_payload,
+            "cypher_mapping_collisions": collision_payload,
+        })
     else:
         serialized_schema = serialize_schema(
             question=ex["question"],
@@ -89,7 +118,13 @@ def spider_add_serialized_schema(ex: dict, data_args: DataArguments, data_traini
             schema_serialization_with_db_content=data_training_args.schema_serialization_with_db_content,
             normalize_query=data_training_args.normalize_query,
         )
-    return {"serialized_schema": serialized_schema}
+        result["serialized_schema"] = serialized_schema
+
+    if "serialized_schema" not in result:
+        result["serialized_schema"] = serialized_schema
+    if "query_short" not in result:
+        result["query_short"] = ex["query"]
+    return result
 
 
 def spider_pre_process_function(
@@ -153,7 +188,11 @@ def spider_pre_process_function(
         return_overflowing_tokens=False,
     )
 
-    print(f"Queries:\n{batch['query'][0]}\n\n\n") 
+    queries_for_loss = batch.get("query_short")
+    if queries_for_loss is None:
+        queries_for_loss = batch["query"]
+
+    print(f"Queries:\n{queries_for_loss[0]}\n\n\n") 
 
     targets = [
         spider_get_target(
@@ -164,7 +203,7 @@ def spider_pre_process_function(
             capitalize_query=data_training_args.capitalize_query,
             target_with_db_id=data_training_args.target_with_db_id,
         )
-        for db_id, query in zip(batch["db_id"], batch["query"])
+        for db_id, query in zip(batch["db_id"], queries_for_loss)
     ]
     
     print(f"Targets:\n{targets[0]}\n\n\n") 
@@ -318,22 +357,43 @@ class SpiderTrainer(Seq2SeqTrainer):
         # pattern = r"\^\^[^\s:]+(?::[^\s:]+)*:"
         for x, context, label, pred in zip(examples, inputs, decoded_label_ids, predictions):
             lang = x.get("lang", None)
+            processed_pred = pred
+            processed_label = label
+            mapping_payload = x.get("cypher_identifier_map")
+
             if lang == "sparql":
-                pred = replace_custom_datatypes(pred, keep_xsd=False)
-                label = replace_custom_datatypes(label, keep_xsd=False)
-            predictions_new.append(pred)
-            metas.append({
+                processed_pred = replace_custom_datatypes(processed_pred, keep_xsd=False)
+                processed_label = replace_custom_datatypes(processed_label, keep_xsd=False)
+            elif lang == "cypher":
+                identifier_mapping: Optional[IdentifierMapping] = None
+                if mapping_payload:
+                    try:
+                        identifier_mapping = IdentifierMapping.from_serializable(mapping_payload)
+                    except ValueError:
+                        identifier_mapping = None
+                if identifier_mapping is None:
+                    identifier_mapping = IdentifierMapping()
+                processed_pred = identifier_mapping.restore_query(processed_pred)
+                processed_label = identifier_mapping.restore_query(processed_label)
+
+            predictions_new.append(processed_pred)
+            meta = {
                 "lang": lang,
                 "query": x["query"],
                 "question": x["question"],
                 "context": context,
-                "label": label,
+                "label": processed_label,
                 "db_id": x["db_id"],
                 "db_path": x["db_path"],
                 "db_table_names": x.get("db_table_names", []),
                 "db_column_names": x.get("db_column_names", []),
                 "db_foreign_keys": x.get("db_foreign_keys", []),
-            }) 
+            }
+            if lang == "cypher":
+                mapping_payload = x.get("cypher_identifier_map")
+                if mapping_payload:
+                    meta["cypher_identifier_map"] = mapping_payload
+            metas.append(meta)
 
         log(f"labels after: {metas[0]['label']}", "sparql_spec_replacement.log")
         # metas = [

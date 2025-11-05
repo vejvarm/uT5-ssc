@@ -134,6 +134,31 @@ class DataTrainingArguments:
         default=False,
         metadata={"help": "Whether to collect token counts for the dataset."},
     )
+    cypher_identifier_mapping_strategy: str = field(
+        default="none",
+        metadata={
+            "help": "Strategy for shortening Cypher identifiers. "
+            "Choose between ``none`` (disabled) or ``strip_prefix`` (drops redundant prefixes)."
+        },
+    )
+    cypher_identifier_mapping_keep_collisions: bool = field(
+        default=True,
+        metadata={
+            "help": "When true, identifiers that would collide after shortening keep their original form."
+        },
+    )
+    cypher_remove_uri_from_schema: bool = field(
+        default=True,
+        metadata={
+            "help": "When true, removes all mentions of `uri (String)` from the schema before model input"
+        },
+    )
+    cypher_remove_foreign_key_attributes_from_schema: bool = field(
+        default=True,
+        metadata={
+            "help": "When true, removes foreign key attributes (lowercase) that are already mentioned as relationships (uppercase)."
+        },
+    )
 
     def __post_init__(self):
         if self.val_max_target_length is None:
