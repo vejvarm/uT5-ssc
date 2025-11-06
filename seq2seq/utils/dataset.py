@@ -148,15 +148,21 @@ class DataTrainingArguments:
         },
     )
     cypher_remove_uri_from_schema: bool = field(
-        default=True,
+        default=False,
         metadata={
             "help": "When true, removes all mentions of `uri (String)` from the schema before model input"
         },
     )
     cypher_remove_foreign_key_attributes_from_schema: bool = field(
-        default=True,
+        default=False,
         metadata={
             "help": "When true, removes foreign key attributes (lowercase) that are already mentioned as relationships (uppercase)."
+        },
+    )
+    cypher_normalize_data_types: bool = field(
+        default=False,
+        metadata={
+            "help": "When true, normalizes Cypher data type labels (e.g., String → string, Long → int, LocalDateTime → Date)."
         },
     )
 

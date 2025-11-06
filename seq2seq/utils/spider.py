@@ -66,9 +66,12 @@ def spider_add_serialized_schema(ex: dict, data_args: DataArguments, data_traini
             prefix=data_args.sparql_prefix_default
         )
     elif "cypher" in lang:
-        normalized_schema = normalize_cypher_schema(ex, 
-                                                    data_training_args.cypher_remove_uri_from_schema, 
-                                                    data_training_args.cypher_remove_foreign_key_attributes_from_schema)
+        normalized_schema = normalize_cypher_schema(
+            ex,
+            data_training_args.cypher_remove_uri_from_schema,
+            data_training_args.cypher_remove_foreign_key_attributes_from_schema,
+            data_training_args.cypher_normalize_data_types,
+        )
         serialized_schema = serialize_cypher_schema(
             question=ex["question"],
             db_path=ex["db_path"],
@@ -151,7 +154,7 @@ def spider_pre_process_function(
         for question, serialized_schema, prefix in zip(batch["question"], batch["serialized_schema"], prefixes)
     ]
 
-    print(f"Inputs:\n{inputs[0]}\n\n\n") 
+    log(f"{inputs}", "inputs.log") 
 
     if data_training_args.collect_token_counts:
         print("Collecting token counts...")
@@ -192,7 +195,7 @@ def spider_pre_process_function(
     if queries_for_loss is None:
         queries_for_loss = batch["query"]
 
-    print(f"Queries:\n{queries_for_loss[0]}\n\n\n") 
+    log(f"{queries_for_loss}", "queries_for_loss.log") 
 
     targets = [
         spider_get_target(
@@ -205,8 +208,8 @@ def spider_pre_process_function(
         )
         for db_id, query in zip(batch["db_id"], queries_for_loss)
     ]
-    
-    print(f"Targets:\n{targets[0]}\n\n\n") 
+
+    log(f"{targets}", "targets.log")
 
     # Setup the tokenizer for targets
     with tokenizer.as_target_tokenizer():
@@ -217,6 +220,8 @@ def spider_pre_process_function(
             truncation=True,
             return_overflowing_tokens=False,
         )
+
+    log(f"{labels['input_ids']}", "labels.log")
 
     model_inputs["labels"] = labels["input_ids"]
     return model_inputs
@@ -331,7 +336,6 @@ def aggregate_metrics_across_languages(
     return dict(aggregated_metrics)
 
 
-
 class SpiderTrainer(Seq2SeqTrainer):
     def _post_process_function(
         self, examples: Dataset, features: Dataset, predictions: np.ndarray, stage: str
@@ -350,8 +354,7 @@ class SpiderTrainer(Seq2SeqTrainer):
         predictions = self.tokenizer.batch_decode(predictions, skip_special_tokens=False)
         predictions = [d.replace("</s>", "").replace("<pad>", "").replace("{{", "{").replace("}}", "}").strip() for d in predictions]
         
-        log(f"labels before: {decoded_label_ids[0]}", "sparql_spec_replacement.log")
-
+        logs = []
         metas = []
         predictions_new = []
         # pattern = r"\^\^[^\s:]+(?::[^\s:]+)*:"
@@ -394,8 +397,11 @@ class SpiderTrainer(Seq2SeqTrainer):
                 if mapping_payload:
                     meta["cypher_identifier_map"] = mapping_payload
             metas.append(meta)
+            logs.append({"context": context, "pred_before": pred, "pred_after": processed_pred, "label_before": label, "label_after": processed_label})
 
-        log(f"labels after: {metas[0]['label']}", "sparql_spec_replacement.log")
+        with open(f"{self.args.output_dir}/preds_and_labels_{stage}.json", "w") as f:
+            json.dump(logs, f, indent=4)
+
         # metas = [
         #     {
         #         "lang": x.get("lang", None),

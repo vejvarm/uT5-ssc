@@ -7,6 +7,12 @@ TOKEN_BOUNDARY = r"[A-Za-z0-9_]"
 CONTEXT_LABEL = "label"
 CONTEXT_PROPERTY = "property"
 
+TYPE_NORMALIZATION_MAP = {
+    "String": "str",
+    "Long": "int",
+    "LocalDateTime": "date",
+}
+
 
 def _build_token_pattern(tokens: Iterable[str]) -> Optional[re.Pattern]:
     escaped = [re.escape(tok) for tok in tokens if tok]
@@ -112,7 +118,24 @@ def strip_cypher_identifier(identifier: str) -> str:
     return value
 
 
-def normalize_cypher_schema(schema: dict, remove_uri: bool = True, remove_foreign_key_attributes: bool = True) -> dict:
+def _normalize_property_types(values: Iterable[str]) -> List[str]:
+    normalized: List[str] = []
+    for entry in values or []:
+        if not isinstance(entry, str):
+            normalized.append(entry)
+            continue
+        cleaned = entry.strip()
+        normalized_value = TYPE_NORMALIZATION_MAP.get(cleaned, cleaned)
+        normalized.append(normalized_value)
+    return normalized
+
+
+def normalize_cypher_schema(
+    schema: dict,
+    remove_uri: bool,
+    remove_foreign_key_attributes: bool,
+    normalize_data_types: bool,
+) -> dict:
     normalized = dict(schema)
 
     node_props_raw = schema.get("NodeProperties", [])
@@ -148,6 +171,8 @@ def normalize_cypher_schema(schema: dict, remove_uri: bool = True, remove_foreig
             continue
         if remove_foreign_key_attributes and node_label and base_lower in relationship_tokens.get(node_label, set()):
             continue
+        if normalize_data_types and "propertyTypes" in prop:
+            prop["propertyTypes"] = _normalize_property_types(prop.get("propertyTypes"))
         filtered_props.append(prop)
 
     normalized["NodeProperties"] = filtered_props

@@ -46,6 +46,6 @@
     "eval_steps": 100,
     "predict_with_generate": true,
     "cache_dir": "./.cache",
-    "resume_from_checkpoint": false,
+    "resume_from_checkpoint": true,
     "trust_remote_code": true
 }
