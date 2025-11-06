@@ -138,7 +138,8 @@ class DataTrainingArguments:
         default="none",
         metadata={
             "help": "Strategy for shortening Cypher identifiers. "
-            "Choose between ``none`` (disabled) or ``strip_prefix`` (drops redundant prefixes)."
+            "Choose between ``none`` (disabled), ``strip_prefix`` (drops redundant prefixes), "
+            "or ``strip_root_only`` (removes only the leading ``ROOT__`` label prefix)."
         },
     )
     cypher_identifier_mapping_keep_collisions: bool = field(

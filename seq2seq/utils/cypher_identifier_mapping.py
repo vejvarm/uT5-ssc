@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 TOKEN_BOUNDARY = r"[A-Za-z0-9_]"
@@ -10,6 +10,9 @@ CONTEXT_PROPERTY = "property"
 TYPE_NORMALIZATION_MAP = {
     "String": "str",
     "Long": "int",
+    "Double": "num",
+    "Float": "num",
+    "Boolean": "bool",
     "LocalDateTime": "date",
 }
 
@@ -116,6 +119,14 @@ def strip_cypher_identifier(identifier: str) -> str:
     if "__" in value:
         value = value.split("__", 1)[1]
     return value
+
+
+def strip_root_prefix(identifier: str) -> str:
+    if not identifier:
+        return ""
+    if identifier.startswith("ROOT__"):
+        return identifier[len("ROOT__") :]
+    return identifier
 
 
 def _normalize_property_types(values: Iterable[str]) -> List[str]:
@@ -300,17 +311,37 @@ class CypherIdentifierMappingBuilder:
         strategy = (strategy or "none").lower()
         if strategy == "none":
             return IdentifierMapping()
-        if strategy != "strip_prefix":
+        if strategy == "strip_prefix":
+            shorteners: Dict[str, Callable[[str], str]] = {
+                CONTEXT_LABEL: strip_cypher_identifier,
+                CONTEXT_PROPERTY: strip_cypher_identifier,
+            }
+        elif strategy == "strip_root_only":
+            shorteners = {
+                CONTEXT_LABEL: strip_root_prefix,
+            }
+        else:
             raise ValueError(f"Unsupported Cypher identifier mapping strategy `{strategy}`.")
 
         contexts = self._collect_candidates(schema)
+        return self._build_identifier_mapping(contexts, shorteners)
+
+    def _build_identifier_mapping(
+        self,
+        contexts: Dict[str, List[str]],
+        shorteners: Dict[str, Callable[[str], str]],
+    ) -> IdentifierMapping:
         forward_by_context: Dict[str, Dict[str, str]] = {ctx: {} for ctx in contexts}
         collisions_by_context: Dict[str, List[Tuple[str, str]]] = {ctx: [] for ctx in contexts}
         used_shorts: Dict[str, set] = {ctx: set() for ctx in contexts}
 
         for ctx, tokens in contexts.items():
+            shortener = shorteners.get(ctx)
+            if shortener is None:
+                continue
+
             for original in tokens:
-                shortened = strip_cypher_identifier(original)
+                shortened = shortener(original)
                 if not shortened or shortened == original:
                     continue
 

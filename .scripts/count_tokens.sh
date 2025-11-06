@@ -40,12 +40,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-python seq2seq/count_tokens.py configs/app_a_count_tokens/sparql_compact.json  # DONE 800
-python seq2seq/count_tokens.py configs/app_a_count_tokens/cypher_compact.json  # DONE 800 DONE 800
-python seq2seq/count_tokens.py configs/app_a_count_tokens/sql_compact.json  # DONE 800
-python seq2seq/count_tokens.py configs/app_a_count_tokens/sql_no-schema.json   # TODO
-python seq2seq/count_tokens.py configs/app_a_count_tokens/sparql_no-schema.json  # TODO
-python seq2seq/count_tokens.py configs/app_a_count_tokens/cypher_no-schema.json   # TODO
-python seq2seq/count_tokens.py configs/app_a_count_tokens/sql_norange.json  # TODO
-python seq2seq/count_tokens.py configs/app_a_count_tokens/sparql_norange.json  # TODO
-python seq2seq/count_tokens.py configs/app_a_count_tokens/cypher_norange.json  # TODO
+python seq2seq/count_tokens.py configs/app_a_count_tokens/cypher_compact.json  
+python seq2seq/count_tokens.py configs/app_a_count_tokens/cypher_norange.json  
+python seq2seq/count_tokens.py configs/app_a_count_tokens/sparql_compact.json  
+python seq2seq/count_tokens.py configs/app_a_count_tokens/sql_compact.json  
+python seq2seq/count_tokens.py configs/app_a_count_tokens/sql_no-schema.json   
+python seq2seq/count_tokens.py configs/app_a_count_tokens/sparql_no-schema.json  
+python seq2seq/count_tokens.py configs/app_a_count_tokens/cypher_no-schema.json   
+python seq2seq/count_tokens.py configs/app_a_count_tokens/sql_norange.json  
+python seq2seq/count_tokens.py configs/app_a_count_tokens/sparql_norange.json  
