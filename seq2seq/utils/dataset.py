@@ -1,6 +1,6 @@
 import json
 import pathlib
-from typing import Optional, List, Dict, Callable
+from typing import Optional, List, Dict, Callable, Tuple
 from dataclasses import dataclass, field
 from datasets.dataset_dict import DatasetDict
 from datasets.arrow_dataset import Dataset
@@ -109,7 +109,9 @@ class DataTrainingArguments:
     )
     schema_serialization_type: str = field(
         default="peteshaw",
-        metadata={"help": "Choose between ``verbose`` and ``peteshaw`` schema serialization."},
+        metadata={
+            "help": "Choose between ``verbose``, ``peteshaw``, ``compact``, ``norange``, ``hybrid`` or ``none`` schema serialization."
+        },
     )
     schema_serialization_randomized: bool = field(
         default=False,
@@ -531,12 +533,19 @@ def serialize_schema(
         column_sep = " , "
         column_str_with_range = "{column} ({range})"
         value_sep = " , "
+    elif schema_serialization_type == "hybrid":
+        db_id_str = " | {db_id}"
+        table_sep = ""
+        table_str = " | {table} : {columns}"
+        column_sep = " , "
+        column_str_with_range = "{column} ({range})"
+        value_sep = " , "
     elif schema_serialization_type == "none":
         return ""
     else:
         raise NotImplementedError
 
-    def get_col_ranges(columns: dict[str: list[int], str: list[str]], col_types, foreign_keys) -> list[str]:
+    def get_col_ranges(columns: dict[str: list[int], str: list[str]], col_types, foreign_keys) -> List[Tuple[str, bool]]:
         """for each column, gets either the data type or the foreign key parent name"""
         col_ranges = []
         col_names = columns["column_name"]
@@ -548,16 +557,18 @@ def serialize_schema(
                     _, primary_name = col_names[foreign_id], col_names[primary_id]
 
             col_range = col_types[i]
+            is_relation = False
             if primary_name is not None:
                 col_range = primary_name
+                is_relation = True
 
             col_range = col_range.lower() if normalize_query else col_range
 
-            col_ranges.append(col_range)
+            col_ranges.append((col_range, is_relation))
         # log(f"col_ranges@serialize_schema: {col_ranges}", "dataset.log")
         return col_ranges
 
-    def get_column_str(table_name: str, column_name: str, col_range: str) -> str:
+    def get_column_str(table_name: str, column_name: str, col_range: str, is_relation: bool) -> str:
         column_name_str = column_name.lower() if normalize_query else column_name
         log(f"\tget_column_str@serialize_schema: 'tab': {table_name}, 'col': {column_name_str}, 'range': {col_range}", "dataset.log")
         if schema_serialization_with_db_content:
@@ -573,6 +584,8 @@ def serialize_schema(
                 return column_str_without_values.format(column=column_name_str)
         elif schema_serialization_type == "compact":
             return column_str_with_range.format(column=column_name_str, range=col_range)
+        elif schema_serialization_type == "hybrid" and is_relation:
+            return column_str_with_range.format(column=column_name_str, range=col_range)
         else:
             return column_str_without_values.format(column=column_name_str)
 
@@ -581,7 +594,12 @@ def serialize_schema(
             table=table_name.lower() if normalize_query else table_name,
             columns=column_sep.join(
                 map(
-                    lambda y: get_column_str(table_name=table_name, column_name=y[1], col_range=y[2]),
+                    lambda y: get_column_str(
+                        table_name=table_name,
+                        column_name=y[1],
+                        col_range=y[2][0],
+                        is_relation=y[2][1],
+                    ),
                     filter(
                         lambda y: y[0] == table_id,
                         zip(

@@ -7,7 +7,7 @@ PLOT_OUTPUT_DIR = BASE_DIR.joinpath("plot_outputs")
 PLOT_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Supported schema types
-SCHEMA_TYPES = ["no_schema", "schema/norange", "schema/compact"]
+SCHEMA_TYPES = ["no_schema", "schema/norange", "schema/hybrid", "schema/compact"]
 
 # Supported languages
 LANGUAGES = ["sql", "sparql", "cypher"]

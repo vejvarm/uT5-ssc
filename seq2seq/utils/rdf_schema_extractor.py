@@ -10,6 +10,25 @@ IMPLICIT_PREFIXES = ['brick', 'csvw', 'dc', 'dcat', 'dcmitype', 'dcterms', 'dcam
                      'geo', 'odrl', 'org', 'prof', 'prov', 'qb', 'schema', 'sh', 'skos', 'sosa', 
                      'ssn', 'time', 'vann', 'void', 'wgs', 'owl', 'rdf', 'rdfs', 'xsd', 'xml']
 
+LITERAL_RANGE_TOKENS = {
+    "literal",
+    "string",
+    "str",
+    "int",
+    "integer",
+    "float",
+    "double",
+    "decimal",
+    "num",
+    "number",
+    "bool",
+    "boolean",
+    "date",
+    "datetime",
+    "time",
+    "timestamp",
+}
+
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set):
@@ -120,25 +139,60 @@ def serialize_sparql_schema(question: str,
         class_sep = " | "
         prop_sep = " , "
         schema = {"Classes": classes, "Properties": properties}
-        serialized_schema = serialize_schema_compactly(schema, prefix, schema_serialization_randomized, class_sep, prop_sep,
-                                                       include_range=True)
+        serialized_schema = serialize_schema_compactly(
+            schema,
+            prefix,
+            schema_serialization_randomized,
+            class_sep,
+            prop_sep,
+            include_property_range=True,
+            include_relationship_range=True,
+        )
     elif schema_serialization_type == "norange":
         class_sep = " | "
         prop_sep = " , "
         schema = {"Classes": classes, "Properties": properties}
-        serialized_schema = serialize_schema_compactly(schema, prefix, schema_serialization_randomized, class_sep, prop_sep, 
-                                                       include_range=False)
+        serialized_schema = serialize_schema_compactly(
+            schema,
+            prefix,
+            schema_serialization_randomized,
+            class_sep,
+            prop_sep,
+            include_property_range=False,
+            include_relationship_range=False,
+        )
+    elif schema_serialization_type == "hybrid":
+        class_sep = " | "
+        prop_sep = " , "
+        schema = {"Classes": classes, "Properties": properties}
+        serialized_schema = serialize_schema_compactly(
+            schema,
+            prefix,
+            schema_serialization_randomized,
+            class_sep,
+            prop_sep,
+            include_property_range=False,
+            include_relationship_range=True,
+        )
     elif schema_serialization_type == "none":
         serialized_schema = ""  
     else:
-        raise NotImplementedError("`schema_serialization_type` for SPARQL must be `compact` or `norange`.")
+        raise NotImplementedError("`schema_serialization_type` for SPARQL must be `compact`, `norange`, `hybrid`, or `none`.")
 
     if schema_serialization_with_db_id:
         serialized_schema = db_id_str + serialized_schema
 
     return serialized_schema
 
-def serialize_schema_compactly(schema, prefix: str = None, shuffle: bool = True, class_sep = " | ", prop_sep = ", ", include_range: bool = True) -> str:
+def serialize_schema_compactly(
+    schema,
+    prefix: str = None,
+    shuffle: bool = True,
+    class_sep = " | ",
+    prop_sep = ", ",
+    include_property_range: bool = True,
+    include_relationship_range: bool = True,
+) -> str:
     # Initialize the compact representation
     compact_representation = []
 
@@ -159,10 +213,13 @@ def serialize_schema_compactly(schema, prefix: str = None, shuffle: bool = True,
                     if domain == cls.split("#")[-1]:  # Property belongs to the class
                         # print(domain, cls.split("#")[-1])
                         prop_name = prop.split("#")[-1]  # Use the local name of the property
-                        if include_range:
-                            range_name = range_.split("#")[-1] if range_ else ""
-                            if prefix is not None:
-                                range_name = range_name.removeprefix(prefix)   
+                        range_name = range_.split("#")[-1] if range_ else ""
+                        normalized_range = range_name.lower()
+                        if prefix is not None and range_name:
+                            range_name = range_name.removeprefix(prefix)
+                        is_literal = not normalized_range or normalized_range in LITERAL_RANGE_TOKENS
+                        should_include = include_property_range if is_literal else include_relationship_range
+                        if should_include and range_name:
                             properties.append(f"{prop_name} ({range_name})")
                         else:
                             properties.append(f"{prop_name}")

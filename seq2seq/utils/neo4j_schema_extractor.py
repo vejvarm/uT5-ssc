@@ -197,17 +197,43 @@ def serialize_cypher_schema(question: str,
     if schema_serialization_type == "compact":
         node_sep = " | "
         prop_sep = " , "
-        serialized_schema = serialize_schema_compactly(schema, prefix, schema_serialization_randomized, node_sep, prop_sep,
-                                                       include_range=True)
+        serialized_schema = serialize_schema_compactly(
+            schema,
+            prefix,
+            schema_serialization_randomized,
+            node_sep,
+            prop_sep,
+            include_property_range=True,
+            include_relationship_range=True,
+        )
     elif schema_serialization_type == "norange":
         node_sep = " | "
         prop_sep = " , "
-        serialized_schema = serialize_schema_compactly(schema, prefix, schema_serialization_randomized, node_sep, prop_sep,
-                                                       include_range=False)
+        serialized_schema = serialize_schema_compactly(
+            schema,
+            prefix,
+            schema_serialization_randomized,
+            node_sep,
+            prop_sep,
+            include_property_range=False,
+            include_relationship_range=False,
+        )
+    elif schema_serialization_type == "hybrid":
+        node_sep = " | "
+        prop_sep = " , "
+        serialized_schema = serialize_schema_compactly(
+            schema,
+            prefix,
+            schema_serialization_randomized,
+            node_sep,
+            prop_sep,
+            include_property_range=False,
+            include_relationship_range=True,
+        )
     elif schema_serialization_type == "none":
         serialized_schema = ""
     else:
-        raise NotImplementedError("`schema_serialization_type` for Cypher must be `compact`, `norange` or `none`.")
+        raise NotImplementedError("`schema_serialization_type` for Cypher must be `compact`, `norange`, `hybrid`, or `none`.")
 
     # print(f"Serialized schema: {serialized_schema}")
 
@@ -216,7 +242,15 @@ def serialize_cypher_schema(question: str,
 
     return serialized_schema
 
-def serialize_schema_compactly(schema: dict, prefix: str = None, shuffle: bool = True, node_sep=" | ", prop_sep=", ", include_range=True):
+def serialize_schema_compactly(
+    schema: dict,
+    prefix: str = None,
+    shuffle: bool = True,
+    node_sep=" | ",
+    prop_sep=", ",
+    include_property_range: bool = True,
+    include_relationship_range: bool = True,
+):
     """
     Generate a compact schema representation.
     Args:
@@ -225,7 +259,8 @@ def serialize_schema_compactly(schema: dict, prefix: str = None, shuffle: bool =
         shuffle (bool): If true, the property/relationship name order is shuffled randomly for each node
         node_sep (str): Separator between nodes in the compact representation.
         prop_sep (str): Separator between properties/relationships within a node.
-        include_range (bool): When true, data types/ranges are included after each property/relationship in brackets
+        include_property_range (bool): When true, data types are included after each node property.
+        include_relationship_range (bool): When true, relationship targets are included after relationship names.
 
     Returns:
         str: Compact representation of the schema.
@@ -246,7 +281,7 @@ def serialize_schema_compactly(schema: dict, prefix: str = None, shuffle: bool =
             prop_type = entry["propertyTypes"][0] if entry["propertyTypes"] else "Unknown"
             if prefix and prop_name.startswith(prefix):
                 prop_name = prop_name[len(prefix):]
-            if include_range:
+            if include_property_range and prop_type:
                 property_reprs.append(f"{prop_name} ({prop_type})")
             else:
                 property_reprs.append(f"{prop_name}")
@@ -257,7 +292,7 @@ def serialize_schema_compactly(schema: dict, prefix: str = None, shuffle: bool =
                 rel_name = rel["relationshipType"]
                 target_labels = [lbl[len(prefix):] if prefix and lbl.startswith(prefix) else lbl for lbl in rel["endNodeLabels"]]
                 target_label = target_labels[0] if len(target_labels) == 1 else "Unknown"
-                if include_range:
+                if include_relationship_range and target_label:
                     property_reprs.append(f"{rel_name} ({target_label})")
                 else:
                     property_reprs.append(f"{rel_name}")
@@ -351,7 +386,15 @@ if __name__ == "__main__":
     print("Cleaned Schema:")
     print(json.dumps(schema, indent=4, ensure_ascii=False))
 
-    compact_schema = serialize_schema_compactly(schema, prefix=None, shuffle=False, node_sep=" | ", prop_sep=", ", include_range=True)
+    compact_schema = serialize_schema_compactly(
+        schema,
+        prefix=None,
+        shuffle=False,
+        node_sep=" | ",
+        prop_sep=", ",
+        include_property_range=True,
+        include_relationship_range=True,
+    )
 
     # Print the compact schema
     print("Compact Schema:")
