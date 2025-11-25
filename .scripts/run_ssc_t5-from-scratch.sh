@@ -36,12 +36,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/sql_compact.json
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/sparql_compact.json
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/cypher_compact.json
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/sql_norange.json # DONE
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/sparql_norange.json
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/cypher_norange.json
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/sql_no-schema.json # DONE
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/sparql_no-schema.json # DONE
-python seq2seq/run_seq2seq.py configs/4_ablation-t5-from-scratch/cypher_no-schema.json
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/sql_compact.json
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/sparql_compact.json
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/sql_norange.json # DONE
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/sparql_norange.json
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/sql_no-schema.json # DONE
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/sparql_no-schema.json # DONE
+python -m seq2seq.run_seq2seq configs/4_ablation-t5-from-scratch/cypher_no-schema.json

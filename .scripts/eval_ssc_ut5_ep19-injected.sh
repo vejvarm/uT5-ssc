@@ -36,12 +36,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/sparql_compact.json  
-python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/cypher_compact.json
-python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/sql_compact.json  
-# python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/sql_norange.json  # TODO
-# python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/sparql_norange.json  # TODO
-# python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/cypher_norange.json  # TODO
-# python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/sql_no-schema.json   # TODO
-# python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/sparql_no-schema.json   # TODO
-# python seq2seq/run_seq2seq.py configs/6_ut5-ep19-injected_eval/cypher_no-schema.json   # TODO
+python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/sparql_compact.json  
+python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/sql_compact.json  
+# python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/sql_norange.json  # TODO
+# python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/sparql_norange.json  # TODO
+# python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/cypher_norange.json  # TODO
+# python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/sql_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/sparql_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/6_ut5-ep19-injected_eval/cypher_no-schema.json   # TODO

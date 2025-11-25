@@ -36,6 +36,6 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-python seq2seq/run_seq2seq.py configs/7_ut5-comparison/clean_sparql_compact.json  # TODO 1000
-python seq2seq/run_seq2seq.py configs/7_ut5-comparison/dirty_sparql_compact.json  # TODO 1000
-python seq2seq/run_seq2seq.py configs/7_ut5-comparison/injected_sparql_compact.json  # TODO 1000
+python -m seq2seq.run_seq2seq configs/7_ut5-comparison/clean_sparql_compact.json  # TODO 1000
+python -m seq2seq.run_seq2seq configs/7_ut5-comparison/dirty_sparql_compact.json  # TODO 1000
+python -m seq2seq.run_seq2seq configs/7_ut5-comparison/injected_sparql_compact.json  # TODO 1000

@@ -22,12 +22,12 @@ Refer to [.scripts/init.sh](.scripts/init.sh) for how to set up and initilalize 
 ## Training & Evaluation Cheatsheet
 ```bash
 # SQL, SPARQL, or Cypher single-language runs
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean/sql_compact.json
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean/sparql_compact.json
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean/sql_compact.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean/sparql_compact.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean/cypher_compact.json
 
 # Joint-language or ablation studies
-python seq2seq/run_seq2seq.py configs/rq5_joint_clean/sql_norange.json
+python -m seq2seq.run_seq2seq configs/rq5_joint_clean/sql_norange.json
 
 # Batch evaluation (produces preds_and_labels_*.json inside /work/results)
 bash .scripts/eval_ssc_ut5_ep19-clean-2048.sh

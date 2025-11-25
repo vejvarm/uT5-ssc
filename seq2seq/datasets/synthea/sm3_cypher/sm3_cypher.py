@@ -40,7 +40,7 @@ _LICENSE = "Apache License 2.0"
 _DS_NAME = "sm3"
 _LANG = "cypher"
 # _URL = "https://www.dropbox.com/scl/fi/37117bjr1sx1a98ozqeb0/Spider4SSC.tgz?rlkey=k92gma53cd4fmmbf98m4vygur&st=k7ngbh13&dl=1"
-_FILEPATH = "~/git/uT5-ssc/data/synthea_clean"
+_FILEPATH = pathlib.Path("data/synthea_clean").resolve()
 
 class SpiderSSC(datasets.GeneratorBasedBuilder):
     VERSION = datasets.Version("1.2.0")
@@ -172,7 +172,6 @@ class SpiderSSC(datasets.GeneratorBasedBuilder):
                     lang = _LANG
                     query = sample[lang]
                     db_id = sample["db_id"]
-                    print(db_id)
                     if lang not in self.schema_cache.keys():
                         self.schema_cache[lang] = dict()
 
@@ -181,7 +180,7 @@ class SpiderSSC(datasets.GeneratorBasedBuilder):
                             db=os.path.join(db_path, db_id, f"{db_id}{self.db_ext[lang]}"), f=db_id
                         )
                     schema = self.schema_cache[lang][db_id]
-                    print(f"db_id: {db_id} | schema: {schema}")
+                    
                     data_dict = {
                         "lang": lang,
                         "query": query,

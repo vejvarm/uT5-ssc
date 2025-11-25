@@ -36,12 +36,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-# python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/sql_compact.json
-# python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/sparql_compact.json
-# python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/cypher_compact.json
-# python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/sql_norange.json
-# python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/sparql_norange.json
-# python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/cypher_norange.json
-python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/sql_no-schema.json
-python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/sparql_no-schema.json
-python seq2seq/run_seq2seq.py configs/rq5_joint_eval_clean/cypher_no-schema.json
+# python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/sql_compact.json
+# python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/sparql_compact.json
+# python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/cypher_compact.json
+# python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/sql_norange.json
+# python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/sparql_norange.json
+# python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/sql_no-schema.json
+python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/sparql_no-schema.json
+python -m seq2seq.run_seq2seq configs/rq5_joint_eval_clean/cypher_no-schema.json

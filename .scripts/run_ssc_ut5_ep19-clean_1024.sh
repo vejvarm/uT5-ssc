@@ -37,14 +37,14 @@ docker start neo4j_server
 
 
 
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/cypher_norange.json  # DONE
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/sparql_compact.json  # TODO (continue)
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/sparql_norange.json  # TODO
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/sql_compact.json  # TODO
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/sql_norange.json  # TODO
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/cypher_compact.json  # DONE
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/sql_no-schema.json   # TODO
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/sparql_no-schema.json  # TODO
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-clean-1024/cypher_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/cypher_norange.json  # DONE
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/sparql_compact.json  # TODO (continue)
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/sparql_norange.json  # TODO
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/sql_compact.json  # TODO
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/sql_norange.json  # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/cypher_compact.json  # DONE
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/sql_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/sparql_no-schema.json  # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-clean-1024/cypher_no-schema.json   # TODO
 
 

@@ -36,12 +36,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-# python seq2seq/run_seq2seq.py configs/1_eval_joint/sql_compact.json
-# python seq2seq/run_seq2seq.py configs/1_eval_joint/sparql_compact.json
-# python seq2seq/run_seq2seq.py configs/1_eval_joint/cypher_compact.json
-# python seq2seq/run_seq2seq.py configs/1_eval_joint/sql_norange.json
-# python seq2seq/run_seq2seq.py configs/1_eval_joint/sparql_norange.json
-# python seq2seq/run_seq2seq.py configs/1_eval_joint/cypher_norange.json
-python seq2seq/run_seq2seq.py configs/1_eval_joint/sql_no-schema.json
-python seq2seq/run_seq2seq.py configs/1_eval_joint/sparql_no-schema.json
-python seq2seq/run_seq2seq.py configs/1_eval_joint/cypher_no-schema.json
+# python -m seq2seq.run_seq2seq configs/1_eval_joint/sql_compact.json
+# python -m seq2seq.run_seq2seq configs/1_eval_joint/sparql_compact.json
+# python -m seq2seq.run_seq2seq configs/1_eval_joint/cypher_compact.json
+# python -m seq2seq.run_seq2seq configs/1_eval_joint/sql_norange.json
+# python -m seq2seq.run_seq2seq configs/1_eval_joint/sparql_norange.json
+# python -m seq2seq.run_seq2seq configs/1_eval_joint/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/1_eval_joint/sql_no-schema.json
+python -m seq2seq.run_seq2seq configs/1_eval_joint/sparql_no-schema.json
+python -m seq2seq.run_seq2seq configs/1_eval_joint/cypher_no-schema.json

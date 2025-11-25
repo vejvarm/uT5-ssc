@@ -20,6 +20,7 @@ results/
 logs/
 plot_outputs/
 pretraining/
+data/
 
 # logs
 *.log

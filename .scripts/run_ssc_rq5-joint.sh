@@ -36,6 +36,6 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-# python seq2seq/run_seq2seq.py configs/rq5_joint_clean/joint_compact.json  # DONE 500
-python seq2seq/run_seq2seq.py configs/rq5_joint_clean/joint_norange.json  # TODO 400
-python seq2seq/run_seq2seq.py configs/rq5_joint_clean/joint_no-schema.json  # TODO 400
+# python -m seq2seq.run_seq2seq configs/rq5_joint_clean/joint_compact.json  # DONE 500
+python -m seq2seq.run_seq2seq configs/rq5_joint_clean/joint_norange.json  # TODO 400
+python -m seq2seq.run_seq2seq configs/rq5_joint_clean/joint_no-schema.json  # TODO 400

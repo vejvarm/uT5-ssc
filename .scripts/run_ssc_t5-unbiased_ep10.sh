@@ -36,12 +36,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-# python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/sql_compact.json
-# python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/sparql_compact.json
-# python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/cypher_compact.json
-python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/sql_norange.json
-python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/sparql_norange.json
-python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/cypher_norange.json
-python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/sql_no-schema.json
-python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/sparql_no-schema.json
-python seq2seq/run_seq2seq.py configs/5_unbiased-t5-ep10/cypher_no-schema.json
+# python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/sql_compact.json
+# python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/sparql_compact.json
+# python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/sql_norange.json
+python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/sparql_norange.json
+python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/sql_no-schema.json
+python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/sparql_no-schema.json
+python -m seq2seq.run_seq2seq configs/5_unbiased-t5-ep10/cypher_no-schema.json

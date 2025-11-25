@@ -36,5 +36,5 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-python seq2seq/run_seq2seq.py configs/6_ut5-ep19-clean-2048_eval/cypher_compact.json
-python seq2seq/run_seq2seq.py configs/6_ut5-ep19-clean-2048_eval/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/6_ut5-ep19-clean-2048_eval/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/6_ut5-ep19-clean-2048_eval/cypher_norange.json

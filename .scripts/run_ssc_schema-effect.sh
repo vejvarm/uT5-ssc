@@ -36,12 +36,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/sql_compact.json
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/sparql_compact.json
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/cypher_compact.json
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/sql_norange.json # DONE
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/sparql_norange.json
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/cypher_norange.json
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/sql_no-schema.json # DONE
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/sparql_no-schema.json # DONE
-python seq2seq/run_seq2seq.py configs/1_schema-type-effect/cypher_no-schema.json
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/sql_compact.json
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/sparql_compact.json
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/sql_norange.json # DONE
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/sparql_norange.json
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/sql_no-schema.json # DONE
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/sparql_no-schema.json # DONE
+python -m seq2seq.run_seq2seq configs/1_schema-type-effect/cypher_no-schema.json

@@ -36,12 +36,12 @@ docker start rdf4j_server
 docker start neo4j_server
 
 
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/cypher_compact.json  # DONE 800 TODO 800 v2
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/sql_compact.json  # DONE 800 TODO 800 v2
-python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/sparql_compact.json  # DONE 800 TODO 800 v2
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/sql_norange.json  # DONE
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/sparql_norange.json  # TODO
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/cypher_norange.json  # TODO
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/sql_no-schema.json   # TODO
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/sparql_no-schema.json   # TODO
-# python seq2seq/run_seq2seq.py configs/5_ut5-ep19-dirty/cypher_no-schema.json   # TODO
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/cypher_compact.json  # DONE 800 TODO 800 v2
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sql_compact.json  # DONE 800 TODO 800 v2
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sparql_compact.json  # DONE 800 TODO 800 v2
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sql_norange.json  # DONE
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sparql_norange.json  # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/cypher_norange.json  # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sql_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sparql_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/cypher_no-schema.json   # TODO
