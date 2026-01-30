@@ -1,6 +1,6 @@
 {
     "run_name": "sm3_eval_ut5-base_pt-ep19_clean_ft-Cypher-compact",
-    "model_name_or_path": "/work/results/ut5-base/sm3/clean/ep19/cypher/schema/compact/checkpoint-128",
+    "model_name_or_path": "/work/results/ut5-base/sm3/clean/ep19/cypher/schema/compact",
     "devices": "0,1",
     "dataset": "sm3_cypher",
     "metric_config": "test_suite",

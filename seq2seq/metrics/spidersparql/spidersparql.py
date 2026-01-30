@@ -85,6 +85,7 @@ class SpiderSSC(evaluate.Metric):
                     "references": {
                         "lang": datasets.Value("string"),
                         "query": datasets.Value("string"),
+                        "sql": datasets.Value("string"),
                         "question": datasets.Value("string"),
                         "context": datasets.Value("string"),
                         "label": datasets.Value("string"),

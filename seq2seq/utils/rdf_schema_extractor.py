@@ -328,7 +328,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("split", type=str, choices=["dev", "train"], help="Which split should have the schemas extracted and merged with the json")
+    parser.add_argument("split", type=str, choices=["test", "dev", "train"], help="Which split should have the schemas extracted and merged with the json")
     parser.add_argument("--ds-path", type=pathlib.Path, default=pathlib.Path("/media/freya/kubuntu-data/git/Spider4SSC/data/Spider4SSC/"), help="Path to the Spider4SSC dataset root.")
     parser.add_argument("--clean", type=bool, action=argparse.BooleanOptionalAction, default=False, help="Clean up the schema prefixes to remove implicit ones.")
     parser.add_argument("--dump-schema", type=bool, action=argparse.BooleanOptionalAction, default=True, help="Dump individual schema file to the location of the ttl file.")

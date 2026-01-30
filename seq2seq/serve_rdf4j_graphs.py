@@ -12,23 +12,30 @@ async def main(args):
 
     assert dataset_folder.exists()
 
+    test_split = []
     dev_split = []
     train_split = []
-    if split == "dev" or split == "all":
+
+    if split in {"test", "all"}:
+        try:
+            test_split = json.load(dataset_folder.joinpath("test.json").open())
+        except Exception as e:
+            raise FileNotFoundError(f"Test split file not found: {e}")
+        
+    if split in {"dev", "all"}:
         try:
             dev_split = json.load(dataset_folder.joinpath("dev.json").open())
         except Exception as e:
-            raise FileNotFoundError(f"Dev split file not found `{e}`")
+            raise FileNotFoundError(f"Dev split file not found: {e}")
         
-    if split == "train" or split == "all":
+    if split in {"train", "all"}:
         try:
-            train_split = json.load(dataset_folder.joinpath("dev.json").open())
+            train_split = json.load(dataset_folder.joinpath("train.json").open())
         except Exception as e:
-            raise FileNotFoundError(f"Train split file not found `{e}`")
+            raise FileNotFoundError(f"Train split file not found: {e}")
         
-    kg_names = set()
-    for entry in chain(dev_split, train_split):
-        kg_names.add(entry["db_id"])
+    # Extract unique knowledge graph names
+    kg_names = set(entry["db_id"] for entry in chain(test_split, dev_split, train_split))
 
 
     rdf4j = RDF4jConnector()
@@ -48,5 +55,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("dataset_folder", type=pathlib.Path, help="path to the root of the Spider4SSC dataset folder")
-    parser.add_argument("--split", default="dev", choices=["dev", "train", "all"], help="split for which to load the knowledge graphs")
+    parser.add_argument("--split", default="dev", choices=["test", "dev", "train", "all"], help="split for which to load the knowledge graphs")
     asyncio.run(main(parser.parse_args()))

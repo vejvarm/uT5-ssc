@@ -151,7 +151,7 @@ def main() -> None:
     assert isinstance(tokenizer, PreTrainedTokenizerFast), "Only fast tokenizers are currently supported"
     if isinstance(tokenizer, T5TokenizerFast):
         # In T5 `<` is OOV, see https://github.com/google-research/language/blob/master/language/nqg/tasks/spider/restore_oov.py
-        specials = [" {", " }", " <=", " <", "^^"]
+        specials = ["{", "}", " <=", " <", "^^"]
         added = [AddedToken(tok, normalized=True) for tok in specials]
         tokenizer.add_tokens(added)
 
@@ -264,6 +264,11 @@ def main() -> None:
     # Testing
     if training_args.do_predict:
         logger.info("*** Predict ***")
+        predict_with_metrics = (
+            training_args.do_eval
+            if data_training_args.predict_with_metrics is None
+            else data_training_args.predict_with_metrics
+        )
         for section, test_split in dataset_splits.test_splits.items():
             results = trainer.predict(
                 test_split.dataset, 
@@ -271,6 +276,7 @@ def main() -> None:
                 max_length=data_training_args.val_max_target_length,
                 max_time=data_training_args.val_max_time,
                 num_beams=data_training_args.num_beams,
+                compute_metrics=predict_with_metrics,
                 metric_key_prefix=section)
             metrics = results.metrics
 

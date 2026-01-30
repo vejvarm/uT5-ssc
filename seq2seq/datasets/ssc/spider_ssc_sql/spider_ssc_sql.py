@@ -46,7 +46,7 @@ _LICENSE = "CC BY-SA 4.0"
 # _URL = "https://drive.google.com/uc?export=download&id=1_AckYkinAnhqmRQtGsQgUKAnTHxxX5J0"
 
 _DS_NAME = "spidersscSQL"
-_URL = "https://www.dropbox.com/scl/fi/rdxiry9i8z9b6luiho54y/SpiderSubset.tgz?rlkey=gn9ls713pehfdxmal75zlg3bf&st=687j7mqs&dl=1"
+_URL = "https://www.dropbox.com/scl/fi/oj1tdcoq32d25wqq7ys0i/Spider4SSC.tgz?rlkey=82zp08flt9ijvd59fb8iw74vu&st=0m250tmw&dl=1"
 # _DS_NAME = "spidersscFullDev"
 # _URL = "https://www.dropbox.com/scl/fi/7hosjg3bsm0d2ucqudrbl/SpiderSubset_fullDev.tgz?rlkey=4nvy1886b3jo785wiwcun7tmf&st=sk43241g&dl=1"
 
@@ -115,19 +115,26 @@ class SpiderSSC(datasets.GeneratorBasedBuilder):
                 name=datasets.Split.TRAIN,
                 gen_kwargs={
                     "data_filepaths": [
-                        os.path.join(downloaded_filepath, "SpiderSubset/train_spider.json"),
-                        os.path.join(downloaded_filepath, "SpiderSubset/train_others.json"),
+                        os.path.join(downloaded_filepath, "Spider4SSC/train.json"),
+                        os.path.join(downloaded_filepath, "Spider4SSC/train_others.json"),
                     ]
                     if self.include_train_others
-                    else [os.path.join(downloaded_filepath, "SpiderSubset/train_spider.json")],
-                    "db_path": os.path.join(downloaded_filepath, "SpiderSubset/database"),
+                    else [os.path.join(downloaded_filepath, "Spider4SSC/train.json")],
+                    "db_path": os.path.join(downloaded_filepath, "Spider4SSC/database"),
                 },
             ),
             datasets.SplitGenerator(
                 name=datasets.Split.VALIDATION,
                 gen_kwargs={
-                    "data_filepaths": [os.path.join(downloaded_filepath, "SpiderSubset/dev.json")],
-                    "db_path": os.path.join(downloaded_filepath, "SpiderSubset/database"),
+                    "data_filepaths": [os.path.join(downloaded_filepath, "Spider4SSC/dev.json")],
+                    "db_path": os.path.join(downloaded_filepath, "Spider4SSC/database"),
+                },
+            ),
+            datasets.SplitGenerator(
+                name=datasets.Split.TEST,
+                gen_kwargs={
+                    "data_filepaths": [os.path.join(downloaded_filepath, "Spider4SSC/test.json")],
+                    "db_path": os.path.join(downloaded_filepath, "Spider4SSC/database_test"),
                 },
             ),
         ]
@@ -149,7 +156,7 @@ class SpiderSSC(datasets.GeneratorBasedBuilder):
                     schema = self.schema_cache[db_id]
                     yield idx, {
                         "lang": "sql",
-                        "query": sample["query"],
+                        "query": sample["sql"],
                         "question": sample["question"],
                         "db_id": db_id,
                         "db_path": db_path,

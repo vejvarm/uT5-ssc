@@ -290,7 +290,7 @@ def group_predictions_by_lang(
         lang = meta["lang"]
         grouped_predictions[lang].append(pred)
         # Keep the complete meta dictionary with all required fields
-        grouped_metas[lang].append({
+        grouped_meta = {
             "lang": meta.get("lang", None),
             "query": meta["query"],
             "question": meta["question"],
@@ -301,7 +301,10 @@ def group_predictions_by_lang(
             "db_table_names": meta.get("db_table_names", None) or [],
             "db_column_names": meta.get("db_column_names", None) or [],
             "db_foreign_keys": meta.get("db_foreign_keys", None) or []
-        })
+        }
+        if "sql" in meta:
+            grouped_meta["sql"] = meta.get("sql") or ""
+        grouped_metas[lang].append(grouped_meta)
     
     return dict(grouped_predictions), dict(grouped_metas)
 
@@ -392,6 +395,8 @@ class SpiderTrainer(Seq2SeqTrainer):
                 "db_column_names": x.get("db_column_names", []),
                 "db_foreign_keys": x.get("db_foreign_keys", []),
             }
+            if "sql" in x:
+                meta["sql"] = x.get("sql")
             if lang == "cypher":
                 mapping_payload = x.get("cypher_identifier_map")
                 if mapping_payload:
@@ -448,6 +453,8 @@ class SpiderTrainer(Seq2SeqTrainer):
             # Collect metrics for each language
             all_metrics = {}
             for lang in metas.keys():
+                print(f"Computing metrics for language: {lang}")
+                print(metas.keys())
                 try:
                     metrics = self.metric.compute(
                         predictions=predictions[lang],

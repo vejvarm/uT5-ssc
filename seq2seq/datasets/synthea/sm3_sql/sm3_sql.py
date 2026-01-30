@@ -173,7 +173,7 @@ class SpiderSSC(datasets.GeneratorBasedBuilder):
                 idx = 0
                 for sample in spider_joint:
                     lang = _LANG
-                    query = sample[lang]
+                    query = sample["sql"]
                     db_id = sample["db_id"]
                     if lang not in self.schema_cache.keys():
                         self.schema_cache[lang] = dict()

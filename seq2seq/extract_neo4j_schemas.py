@@ -6,6 +6,7 @@ from itertools import chain
 from third_party.test_suite.neo4j_connector import Neo4jConnector  # Ensure your Neo4jConnector class is in this module
 from seq2seq.utils.neo4j_schema_extractor import Neo4jSchemaExtractor
 
+
 async def main(args):
     dataset_folder = args.dataset_folder
     split = args.split
@@ -16,8 +17,16 @@ async def main(args):
 
     assert dataset_folder.exists(), "Dataset folder does not exist!"
 
+    test_split = []
     dev_split = []
     train_split = []
+
+    if split in {"test", "all"}:
+        try:
+            test_split = json.load(dataset_folder.joinpath("test.json").open())
+        except Exception as e:
+            raise FileNotFoundError(f"Test split file not found: {e}")
+        
     if split in {"dev", "all"}:
         try:
             dev_split = json.load(dataset_folder.joinpath("dev.json").open())
@@ -31,7 +40,7 @@ async def main(args):
             raise FileNotFoundError(f"Train split file not found: {e}")
         
     # Extract unique knowledge graph names
-    kg_names = set(entry["db_id"] for entry in chain(dev_split, train_split))
+    kg_names = set(entry["db_id"] for entry in chain(test_split, dev_split, train_split))
 
     uname = "neo4j"
     password = "secretserver"

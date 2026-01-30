@@ -12,8 +12,16 @@ async def main(args):
 
     assert dataset_folder.exists(), "Dataset folder does not exist!"
 
+    test_split = []
     dev_split = []
     train_split = []
+
+    if split in {"test", "all"}:
+        try:
+            test_split = json.load(dataset_folder.joinpath("test.json").open())
+        except Exception as e:
+            raise FileNotFoundError(f"Test split file not found: {e}")
+        
     if split in {"dev", "all"}:
         try:
             dev_split = json.load(dataset_folder.joinpath("dev.json").open())
@@ -27,7 +35,7 @@ async def main(args):
             raise FileNotFoundError(f"Train split file not found: {e}")
         
     # Extract unique knowledge graph names
-    kg_names = set(entry["db_id"] for entry in chain(dev_split, train_split))
+    kg_names = set(entry["db_id"] for entry in chain(test_split, dev_split, train_split))
 
     uname = "neo4j"
     password = "secretserver"
@@ -63,6 +71,6 @@ python seq2seq/serve_neo4j_graphs.py ~/git/uT5-ssc/.cache/downloads/extracted/c7
 """)
 
     parser.add_argument("dataset_folder", type=pathlib.Path, help="Path to the root of the Spider4SSC dataset folder")
-    parser.add_argument("--split", default="dev", choices=["dev", "train", "all"], help="Split for which to load the knowledge graphs")
+    parser.add_argument("--split", default="dev", choices=["test", "dev", "train", "all"], help="Split for which to load the knowledge graphs")
     parser.add_argument("--neo4j-root", default=pathlib.Path("/neo4j/"), type=pathlib.Path, help="Root folder of the neo4j server on your drive")
     asyncio.run(main(parser.parse_args()))

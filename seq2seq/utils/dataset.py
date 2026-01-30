@@ -97,6 +97,12 @@ class DataTrainingArguments:
             "``model.generate``, which is used during ``evaluate`` and ``predict``."
         },
     )
+    predict_with_metrics: Optional[bool] = field(
+        default=None,
+        metadata={
+            "help": "Whether to compute metrics during prediction. Defaults to the value of `do_eval` when unset."
+        },
+    )
     ignore_pad_token_for_loss: bool = field(
         default=True,
         metadata={
@@ -374,6 +380,14 @@ def prepare_splits(
         )
 
     if training_args.do_predict:
+        if not data_args.test_sections:
+            if "test" in dataset_dict:
+                data_args.test_sections = ["test"]
+            else:
+                raise ValueError(
+                    "No test sections specified for prediction and dataset has no `test` split. "
+                    "Please set `test_sections` in your data args."
+                )
         test_splits = {
             section: _prepare_eval_split(
                 dataset_dict[section],

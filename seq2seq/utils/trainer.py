@@ -118,10 +118,11 @@ class Seq2SeqTrainer(transformers.trainer_seq2seq.Seq2SeqTrainer):
         test_dataset: Dataset,
         test_examples: Dataset,
         ignore_keys: Optional[List[str]] = None,
-        metric_key_prefix: str = "eval",
+        metric_key_prefix: str = "test",
         max_length: Optional[int] = None,
         max_time: Optional[int] = None,
         num_beams: Optional[int] = None,
+        compute_metrics: Optional[bool] = None,
     ) -> PredictionOutput:
         self._max_length = max_length
         self._max_time = max_time
@@ -149,7 +150,8 @@ class Seq2SeqTrainer(transformers.trainer_seq2seq.Seq2SeqTrainer):
         finally:
             self.compute_metrics = compute_metrics
 
-        if self.compute_metrics is not None:
+        run_metrics = self.compute_metrics is not None if compute_metrics is None else compute_metrics
+        if run_metrics:
             # We might have removed columns from the dataset so we put them back.
             if isinstance(test_dataset, Dataset):
                 test_dataset.set_format(

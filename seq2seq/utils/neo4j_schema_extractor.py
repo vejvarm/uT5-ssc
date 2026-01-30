@@ -1,3 +1,4 @@
+import os
 import asyncio
 import pathlib
 import random
@@ -17,7 +18,20 @@ class Neo4jSchemaExtractor:
         if db_root is None:
             raise NotImplementedError("path to database root folder (`db_root`) must be defined.")
         self.db_root = pathlib.Path(db_root)
-        self.connector = Neo4jConnector(uri, user, password)
+        neo4j_root = os.getenv("NEO4J_DB_ROOT", "/neo4j")
+        self.connector = Neo4jConnector(uri, user, password, neo4j_root=neo4j_root)
+
+    def _extract_prefixes_from_ttl_path(self, ttl_path: pathlib.Path) -> dict:
+        prefixes = {}
+        with ttl_path.open() as f:
+            for line in f.readlines():
+                if line.startswith("@prefix"):
+                    line = line.removeprefix("@prefix").strip(" .\n")
+                    prefix, uri = line.split(" ")
+                    prefix = prefix.strip(": ") or "ROOT"
+                    uri = uri.removesuffix(" .").strip(" <>")
+                    prefixes[prefix] = uri
+        return prefixes
 
     def close(self):
         self.driver.close()
@@ -77,14 +91,17 @@ class Neo4jSchemaExtractor:
             db_id = temp_db_name
         if init_db:
             loop.run_until_complete(self.connector.create_database(db_id))
-            prefixes = self.connector.extract_prefixes_from_ttl(ttl_id)
+            try:
+                prefixes = self.connector.extract_prefixes_from_ttl(ttl_id)
+            except (FileNotFoundError, PermissionError, OSError):
+                ttl_path = self.db_root.joinpath(ttl_id).joinpath(f"{ttl_id}.ttl")
+                print(ttl_path)
+                prefixes = self._extract_prefixes_from_ttl_path(ttl_path)
             loop.run_until_complete(self.connector.init_database(prefixes, ttl_id))
-            print(prefixes)
             
         node_properties = self.extract_node_properties(db_id)
         relationships = self.extract_relationships(db_id)
         relationship_properties = self.extract_relationship_properties(db_id)
-        print(node_properties)
 
         schema = {
             "Nodes": node_properties,
@@ -383,8 +400,8 @@ if __name__ == "__main__":
     # Save schema to a file
     # extractor.save_schema(schema, "neo4j_cleaned_schema.json")
 
-    print("Cleaned Schema:")
-    print(json.dumps(schema, indent=4, ensure_ascii=False))
+    print("Cleaned Schema")
+    # print(json.dumps(schema, indent=4, ensure_ascii=False))
 
     compact_schema = serialize_schema_compactly(
         schema,
@@ -397,7 +414,7 @@ if __name__ == "__main__":
     )
 
     # Print the compact schema
-    print("Compact Schema:")
-    print(compact_schema)
+    # print("Compact Schema:")
+    # print(compact_schema)
 
     extractor.close()
