@@ -3,6 +3,7 @@ source ~/miniconda3/bin/activate ./.conda
 
 # SELECT THE DATABASE ROOT AND OVERRIDE THE KG NAME for all eval samples
 export NEO4J_DB_ROOT="/neo4j_ssc_test"
+export NEO4J_DOCKER_CONTAINER="neo4j_server_ssc_test"
 # Optional: use a separate import folder for test DBs
 # export NEO4J_DB_SUBFOLDER="import/database_test"
 # export NEO4J_OVERRIDE_KG="ssc_test"
@@ -36,13 +37,10 @@ export NEO4J_DB_ROOT="/neo4j_ssc_test"
 #     graphstack/dozerdb:5.20.0.0-alpha.1
 
 # Copy database files to neo4j_ssc_test import folder (test DBs live in database_test)
-# sudo cp -r /home/vejvar-martin-nj/git/uT5-ssc/data/ssc_test/database_test /neo4j_ssc_test/import/database_test
-# sudo ln -s /neo4j_ssc_test/import/database_test /neo4j_ssc_test/import/database
+# sudo cp -r /home/vejvar-martin-nj/git/uT5-ssc/data/ssc_test/database /neo4j_ssc_test/import/database
 # sudo chown -R neo4j:neo4j /neo4j_ssc_test
 # docker start neo4j_server_ssc_test
 
-
-# sudo chmod -R a+r /neo4j_ssc_test/import/database
 # sudo chmod 777 /neo4j_ssc_test/import/database
 
 # # Populate databases
@@ -50,13 +48,15 @@ export NEO4J_DB_ROOT="/neo4j_ssc_test"
 # python -m seq2seq.serve_neo4j_graphs /home/vejvar-martin-nj/git/uT5-ssc/data/ssc_test --split test --neo4j-root /neo4j_ssc_test/
 
 # Extract database schemas
-# python -m seq2seq.utils.rdf_schema_extractor test --ds-path /home/vejvar-martin-nj/git/uT5-ssc/data/ssc_test --injected30p --dump-schema
-# python seq2seq/extract_neo4j_schemas.py /home/vejvar-martin-nj/git/uT5-ssc/data/ssc_test --neo4j-root /neo4j_ssc_test/ --split test --keep-existing 
+# python -m seq2seq.utils.rdf_schema_extractor test --ds-path /home/vejvar-martin-nj/git/uT5-ssc/data/ssc_test --clean --dump-schema --overwrite
+# python seq2seq/extract_neo4j_schemas.py /home/vejvar-martin-nj/git/uT5-ssc/data/ssc_test --neo4j-root /neo4j_ssc_test/ --split test 
 
 
 # ______________________
 
 # __ON SUBSEQUENT RUNS__
+docker stop rdf4j_server
+docker stop neo4j_server
 docker start rdf4j_server_ssc_test
 docker start neo4j_server_ssc_test
 
@@ -66,7 +66,7 @@ docker start neo4j_server_ssc_test
 # python -m seq2seq.run_seq2seq configs/8_predict/injected30p/cypher_norange.json
 python -m seq2seq.run_seq2seq configs/8_predict/injected30p/sql_compact.json
 python -m seq2seq.run_seq2seq configs/8_predict/injected30p/sparql_compact.json
-python -m seq2seq.run_seq2seq configs/8_predict/injected30p/cypher_compact.json
+# python -m seq2seq.run_seq2seq configs/8_predict/injected30p/cypher_compact.json
 # python -m seq2seq.run_seq2seq configs/8_predict/injected30p/sql_no-schema.json
 # python -m seq2seq.run_seq2seq configs/8_predict/injected30p/sparql_no-schema.json 
 # python -m seq2seq.run_seq2seq configs/8_predict/injected30p/cypher_no-schema.json 

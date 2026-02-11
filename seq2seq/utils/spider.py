@@ -353,9 +353,9 @@ class SpiderTrainer(Seq2SeqTrainer):
             ]
 
         decoded_label_ids = self.tokenizer.batch_decode(_label_ids, skip_special_tokens=True)
-        # decoded_label_ids = [d.replace("</s>", "").replace("<pad>", "").strip() for d in decoded_label_ids]
+        decoded_label_ids = [d.replace("</s>", "").replace("<pad>", "").replace("{{", "{").replace("}}", "}").replace("< >", "<>").strip() for d in decoded_label_ids]
         predictions = self.tokenizer.batch_decode(predictions, skip_special_tokens=False)
-        predictions = [d.replace("</s>", "").replace("<pad>", "").replace("{{", "{").replace("}}", "}").strip() for d in predictions]
+        predictions = [d.replace("</s>", "").replace("<pad>", "").replace("{{", "{").replace("}}", "}").replace("< >", "<>").strip() for d in predictions]
         
         logs = []
         metas = []

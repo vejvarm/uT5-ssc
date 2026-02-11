@@ -96,7 +96,7 @@ python seq2seq/extract_neo4j_schemas.py ~/git/uT5-ssc/.cache/downloads/extracted
 """)
 
     parser.add_argument("dataset_folder", type=pathlib.Path, help="Path to the root of the Spider4SSC dataset folder")
-    parser.add_argument("--split", default="dev", choices=["dev", "train", "all"], help="Split for which to load the knowledge graphs")
+    parser.add_argument("--split", default="dev", choices=["test", "dev", "train", "all"], help="Split for which to load the knowledge graphs")
     parser.add_argument("--neo4j-root", default=pathlib.Path("/neo4j/"), type=pathlib.Path, help="Root folder of the neo4j server on your drive")
     parser.add_argument("--keep-existing", default=False, action=argparse.BooleanOptionalAction, help="If True, only extract schemas that don't exist in the database subfolder yet.")
     asyncio.run(main(parser.parse_args()))

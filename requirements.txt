@@ -24,4 +24,4 @@ wandb
 datasets==3.2.0
 evaluate==0.2.2
 rapidfuzz
-
+git+https://github.com/vejvarm/Spider4SSC.git

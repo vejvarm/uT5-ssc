@@ -27,19 +27,46 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, data_args, data_training_args, training_args = parser.parse_json_file(
-            json_file=os.path.abspath(sys.argv[1])
-        )
+        try:
+            model_args, data_args, data_training_args, training_args = parser.parse_json_file(
+                json_file=os.path.abspath(sys.argv[1]),
+                allow_extra_keys=True,
+            )
+        except TypeError:
+            model_args, data_args, data_training_args, training_args = parser.parse_json_file(
+                json_file=os.path.abspath(sys.argv[1])
+            )
     elif len(sys.argv) == 3 and sys.argv[1].startswith("--local_rank") and sys.argv[2].endswith(".json"):
         data = json.loads(Path(os.path.abspath(sys.argv[2])).read_text())
         data.update({"local_rank": int(sys.argv[1].split("=")[1])})
-        model_args, data_args, data_training_args, training_args = parser.parse_dict(args=data)
+        try:
+            model_args, data_args, data_training_args, training_args = parser.parse_dict(args=data, allow_extra_keys=True)
+        except TypeError:
+            model_args, data_args, data_training_args, training_args = parser.parse_dict(args=data)
     else:
         model_args, data_args, data_training_args, training_args = parser.parse_args_into_dataclasses()
     
 
-    # Set the flag to collect token counts
-    print(data_training_args.collect_token_counts)
+    # Token counting is implemented as a side-effect during preprocessing (see spider_pre_process_function).
+    # This script just forces the relevant split(s) to be prepared/iterated.
+    print(f"collect_token_counts={data_training_args.collect_token_counts}")
+
+    # This script is not a trainer; we use the standard `do_*` flags only to select which split to preprocess.
+    # Prefer test split when requested, otherwise validation, otherwise train.
+    if training_args.do_predict:
+        training_args.do_train = False
+        training_args.do_eval = False
+    elif training_args.do_eval:
+        training_args.do_train = False
+        training_args.do_predict = False
+    elif training_args.do_train:
+        training_args.do_eval = False
+        training_args.do_predict = False
+    else:
+        raise ValueError(
+            "Nothing to do: set at least one of `do_train`, `do_eval`, or `do_predict` "
+            "to choose which split to count tokens for."
+        )
 
 
     # Init tokenizer
@@ -64,13 +91,32 @@ def main():
         tokenizer=tokenizer,
     )
 
-    # Collect results
-    results = []
-    for example in dataset_splits.train_split.dataset:  # or eval_split/test_splits as needed
-        results.append(example)
+    splits_to_iterate = []
+    if training_args.do_predict:
+        if dataset_splits.test_splits is None:
+            raise ValueError("`do_predict` was set but no test splits were prepared.")
+        for section, split in dataset_splits.test_splits.items():
+            splits_to_iterate.append((section, split.dataset))
+    elif training_args.do_eval:
+        if dataset_splits.eval_split is None:
+            raise ValueError("`do_eval` was set but no validation split was prepared.")
+        splits_to_iterate.append(("validation", dataset_splits.eval_split.dataset))
+    else:
+        if dataset_splits.train_split is None:
+            raise ValueError("`do_train` was set but no train split was prepared.")
+        splits_to_iterate.append(("train", dataset_splits.train_split.dataset))
 
-    print(f"If you don't see output, make sure to delete your datataset cache at `.cache/spider_ssc_'lang'`")
-    print(f"Saved token counts for {len(results)} samples")
+    total = 0
+    for split_name, split_dataset in splits_to_iterate:
+        # Iterate once to ensure preprocessing side-effects run even when caching is odd.
+        n = 0
+        for _ in split_dataset:
+            n += 1
+        total += n
+        print(f"Prepared split `{split_name}` with {n} samples")
+
+    print("If you don't see output, make sure to delete your dataset cache at `.cache/spider_ssc_*`.")
+    print(f"Saved token counts for {total} samples (across {len(splits_to_iterate)} split(s))")
 
 if __name__ == "__main__":
     main()

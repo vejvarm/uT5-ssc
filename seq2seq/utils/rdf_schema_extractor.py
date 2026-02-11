@@ -288,6 +288,7 @@ def main(args):
     ds_path = args.ds_path
     clean_schema = args.clean
     dump_schema = args.dump_schema
+    overwrite = args.overwrite
     json_path = ds_path.joinpath(f"{split}.json")
     db_folder = ds_path.joinpath("database")
     ds_data = json.load(json_path.open())
@@ -297,17 +298,18 @@ def main(args):
     full_schemas_path = json_path.with_suffix(".schemas.json")
     full_merged_path = json_path.with_suffix(".merged.json")
 
-    if full_schemas_path.exists():
+    if full_schemas_path.exists() and not overwrite:
         print(f"WARNING SchemaFileFound: `{full_schemas_path}` already exists. Make sure to move/delete to recreate it.")
         schemas = json.load(full_schemas_path.open())
     else:
+        full_schemas_path.unlink(missing_ok=True)
         schemas = dict()
         pbar = tqdm(kg_list, desc="Extracting schemas")
         for kg in pbar: 
             pbar.set_postfix({'kg': kg})
             full_kg_path = db_folder.joinpath(f"{kg}/{kg}.ttl")
             if kg not in schemas:
-                schemas[kg] = extract_rdf_schema(full_kg_path, clean_schema, dump_schema, overwrite=True)
+                schemas[kg] = extract_rdf_schema(full_kg_path, clean_schema, dump_schema, overwrite=overwrite)
                 # compact_schema = serialize_schema_compactly(schemas[kg])
                 # print(compact_schema)
 
@@ -318,7 +320,7 @@ def main(args):
 
     # Merge with the original file
     merged = merge(ds_data, schemas)
-    if full_merged_path.exists():
+    if full_merged_path.exists() and not overwrite:
         print(f"WARNING MergedFileFound: `{full_merged_path}` already exists. Make sure to move/delete to recreate it.")
     else:
         json.dump(merged, full_merged_path.open("w"), indent=4, ensure_ascii=False, cls=CustomJSONEncoder)
@@ -332,4 +334,5 @@ if __name__ == "__main__":
     parser.add_argument("--ds-path", type=pathlib.Path, default=pathlib.Path("/media/freya/kubuntu-data/git/Spider4SSC/data/Spider4SSC/"), help="Path to the Spider4SSC dataset root.")
     parser.add_argument("--clean", type=bool, action=argparse.BooleanOptionalAction, default=False, help="Clean up the schema prefixes to remove implicit ones.")
     parser.add_argument("--dump-schema", type=bool, action=argparse.BooleanOptionalAction, default=True, help="Dump individual schema file to the location of the ttl file.")
+    parser.add_argument("--overwrite", type=bool, action=argparse.BooleanOptionalAction, default=False, help="Overwrite existing schema files.")
     main(parser.parse_args())

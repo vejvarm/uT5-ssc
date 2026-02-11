@@ -19,6 +19,23 @@ except ModuleNotFoundError as exc:
 
 
 SUPPORTED_LANGS = {"sql", "sparql", "cypher", "postgresql"}
+SCHEMA_MARKERS = ("no_schema",)
+MODE_DEFAULTS = {
+    "test": {
+        "input_pattern": "predictions_test.json",
+        "output_suffix": "predictions_test_exec_analysis.json",
+        "summary_filename": "predictions_test_exec_summary.json",
+        "fail_info_dirname": "fail_info",
+        "use_label_as_gold": False,
+    },
+    "eval": {
+        "input_pattern": "predictions_eval_None.json",
+        "output_suffix": "predictions_eval_None_exec_analysis.json",
+        "summary_filename": "predictions_eval_None_exec_summary.json",
+        "fail_info_dirname": "fail_info_eval",
+        "use_label_as_gold": True,
+    },
+}
 
 
 def _now_iso() -> str:
@@ -40,6 +57,24 @@ def _db_file_path(db_root: str, db_id: str, lang: str) -> str:
         return db_root
     ext = ".sqlite" if ("sql" in lang or "postgresql" in lang) else ".ttl"
     return str(Path(db_root) / db_id / f"{db_id}{ext}")
+
+
+def _schema_from_path(path: Path, root: Path) -> Optional[str]:
+    try:
+        rel_parts = path.relative_to(root).parts
+    except Exception:
+        rel_parts = path.parts
+    for idx, part in enumerate(rel_parts):
+        lowered = part.lower()
+        if lowered in SCHEMA_MARKERS:
+            return lowered
+        if lowered == "schema":
+            if idx + 1 < len(rel_parts):
+                schema_type = rel_parts[idx + 1].lower()
+                if schema_type.endswith(".json"):
+                    return "schema/unknown"
+                return f"schema/{schema_type}"
+    return None
 
 
 def _row_sort_key(row: List[Any]) -> str:
@@ -175,25 +210,59 @@ def _sql_db_exists(path: str) -> bool:
     return p.is_file()
 
 
-def analyze_record(record: Dict[str, Any]) -> Dict[str, Any]:
+def _resolve_gold_query(
+    record: Dict[str, Any], lang: str, use_label_as_gold: bool
+) -> Tuple[str, str, str]:
+    query_field = record.get("query") or ""
+    gold_sql = record.get("sql") or ""
+    label_field = record.get("label") or ""
+
+    if use_label_as_gold:
+        gold_query = label_field
+        source_field = "label"
+        if not gold_query.strip():
+            if query_field.strip():
+                gold_query = query_field
+                source_field = "query"
+            elif gold_sql.strip():
+                gold_query = gold_sql
+                source_field = "sql"
+        return gold_query, lang, source_field
+
+    if "sql" in lang:
+        return query_field or gold_sql, "sql", "query_or_sql"
+    return gold_sql, "sql", "sql"
+
+
+def analyze_record(
+    record: Dict[str, Any], use_label_as_gold: bool = False
+) -> Dict[str, Any]:
     _require_exec_eval()
     output = dict(record)
     lang = (record.get("lang") or "").lower()
     prediction = record.get("prediction") or ""
-    gold_sql = record.get("sql") or ""
     db_root = record.get("db_path") or ""
     db_id = record.get("db_id") or ""
+    gold_query, gold_lang, gold_source_field = _resolve_gold_query(
+        record, lang, use_label_as_gold
+    )
+    output["gold_query_source_field"] = gold_source_field
+    output["gold_query_lang"] = gold_lang
 
     output["pred_query_processed"], pred_parse_err = _preprocess_query(prediction, lang)
-    output["gold_sql_processed"], gold_parse_err = _preprocess_query(gold_sql, "sql")
+    output["gold_query_processed"], gold_parse_err = _preprocess_query(
+        gold_query, gold_lang
+    )
+    # Keep legacy key for downstream consumers that expect this field name.
+    output["gold_sql_processed"] = output["gold_query_processed"]
 
     order_matters = False
-    if output["gold_sql_processed"]:
-        order_matters = "order by" in output["gold_sql_processed"].lower()
+    if output["gold_query_processed"]:
+        order_matters = "order by" in output["gold_query_processed"].lower()
     output["order_matters"] = order_matters
 
     pred_db_path = _db_file_path(db_root, db_id, lang)
-    gold_db_path = _db_file_path(db_root, db_id, "sql")
+    gold_db_path = _db_file_path(db_root, db_id, gold_lang)
     output["db_pred_path"] = pred_db_path
     output["db_gold_path"] = gold_db_path
 
@@ -230,16 +299,16 @@ def analyze_record(record: Dict[str, Any]) -> Dict[str, Any]:
                     pred_flag, pred_denotation, order_matters
                 )
 
-        if not gold_sql.strip():
+        if not gold_query.strip():
             gold_exec_payload = _build_skipped_payload("missing_gold_sql")
         elif gold_parse_err is not None:
             gold_exec_payload = _build_skipped_payload("gold_parse_error")
         else:
-            if not _sql_db_exists(gold_db_path):
+            if "sql" in gold_lang and not _sql_db_exists(gold_db_path):
                 gold_exec_payload = _build_skipped_payload("missing_db_path")
             else:
                 gold_flag, gold_denotation = _run_exec(
-                    gold_db_path, output["gold_sql_processed"], "sql"
+                    gold_db_path, output["gold_query_processed"], gold_lang
                 )
                 gold_exec_payload = _build_exec_payload(
                     gold_flag, gold_denotation, order_matters
@@ -257,7 +326,7 @@ def analyze_record(record: Dict[str, Any]) -> Dict[str, Any]:
 
         if not prediction.strip():
             fail_info = {"category": "missing_prediction"}
-        elif not gold_sql.strip():
+        elif not gold_query.strip():
             fail_info = {"category": "missing_gold_sql"}
         elif pred_parse_err is not None:
             fail_info = {
@@ -292,7 +361,35 @@ def analyze_record(record: Dict[str, Any]) -> Dict[str, Any]:
     return output
 
 
-def analyze_file(path: Path, max_entries: Optional[int] = None) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+def _fail_group_key(fail_info: Dict[str, Any]) -> str:
+    category = fail_info.get("category", "unknown")
+    reason = fail_info.get("reason")
+    if reason:
+        return f"{category}__{reason}"
+    return category
+
+
+def _reduced_exec_payload(exec_payload: Dict[str, Any]) -> Dict[str, Any]:
+    status = exec_payload.get("status")
+    if status == "result":
+        rows = exec_payload.get("normalized_rows") or []
+        return {
+            "status": "result",
+            "normalized_rows": rows[:5],
+        }
+    if status == "exception":
+        return {
+            "status": "exception",
+            "exception": exec_payload.get("exception"),
+        }
+    return {"status": status}
+
+
+def analyze_file(
+    path: Path,
+    max_entries: Optional[int] = None,
+    use_label_as_gold: bool = False,
+) -> Tuple[List[Dict[str, Any]], Dict[str, Any], Dict[str, List[Dict[str, Any]]]]:
     data = json.loads(path.read_text())
     if not isinstance(data, list):
         raise ValueError(f"Expected a list in {path}, got {type(data)}")
@@ -303,16 +400,31 @@ def analyze_file(path: Path, max_entries: Optional[int] = None) -> Tuple[List[Di
     category_counts: Counter = Counter()
     match_count = 0
     lang_counts: Counter = Counter()
+    fail_groups: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
 
     for record in data:
         lang = (record.get("lang") or "").lower()
         if lang:
             lang_counts[lang] += 1
-        analyzed_record = analyze_record(record)
+        analyzed_record = analyze_record(
+            record, use_label_as_gold=use_label_as_gold
+        )
         analyzed.append(analyzed_record)
-        category_counts[analyzed_record["fail_info"]["category"]] += 1
+        group_key = _fail_group_key(analyzed_record["fail_info"])
+        category_counts[group_key] += 1
         if analyzed_record.get("match") == 1:
             match_count += 1
+        fail_groups[group_key].append(
+            {
+                "db_id": analyzed_record.get("db_id"),
+                "context": analyzed_record.get("context"),
+                "pred_query_processed": analyzed_record.get("pred_query_processed"),
+                "gold_query_processed": analyzed_record.get("gold_query_processed"),
+                "gold_sql_processed": analyzed_record.get("gold_sql_processed"),
+                "pred_exec": _reduced_exec_payload(analyzed_record.get("pred_exec", {})),
+                "gold_exec": _reduced_exec_payload(analyzed_record.get("gold_exec", {})),
+            }
+        )
 
     total = len(analyzed)
     summary = {
@@ -322,7 +434,7 @@ def analyze_file(path: Path, max_entries: Optional[int] = None) -> Tuple[List[Di
         "fail_categories": dict(category_counts),
         "lang_counts": dict(lang_counts),
     }
-    return analyzed, summary
+    return analyzed, summary, fail_groups
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -333,18 +445,36 @@ def write_json(path: Path, payload: Any) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Qualitative error analysis for predictions_test.json outputs."
+        description="Qualitative execution error analysis for predictions_test/eval outputs."
     )
     parser.add_argument(
         "root",
         type=str,
-        help="Root folder to search for predictions_test.json files.",
+        help="Root folder to search for prediction files.",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=tuple(MODE_DEFAULTS.keys()),
+        default="test",
+        help="Preset for defaults: test uses SQL gold; eval uses label gold with same language as prediction.",
+    )
+    parser.add_argument(
+        "--input-pattern",
+        type=str,
+        default=None,
+        help="Filename to search recursively (defaults depend on --mode).",
     )
     parser.add_argument(
         "--output-suffix",
         type=str,
-        default="predictions_test_exec_analysis.json",
-        help="Output filename to write next to each predictions_test.json.",
+        default=None,
+        help="Output filename to write next to each prediction input (defaults depend on --mode).",
+    )
+    parser.add_argument(
+        "--fail-info-dirname",
+        type=str,
+        default=None,
+        help="Directory name for grouped failures next to each prediction file (defaults depend on --mode).",
     )
     parser.add_argument(
         "--max-entries",
@@ -361,12 +491,18 @@ def main() -> None:
         "--summary-path",
         type=str,
         default=None,
-        help="Optional path for a global summary JSON.",
+        help="Optional path for a global summary JSON (defaults depend on --mode).",
     )
     args = parser.parse_args()
 
+    mode_defaults = MODE_DEFAULTS[args.mode]
+    input_pattern = args.input_pattern or mode_defaults["input_pattern"]
+    output_suffix = args.output_suffix or mode_defaults["output_suffix"]
+    fail_info_dirname = args.fail_info_dirname or mode_defaults["fail_info_dirname"]
+    use_label_as_gold = bool(mode_defaults["use_label_as_gold"])
+
     root = Path(args.root)
-    prediction_files = sorted(root.rglob("predictions_test.json"))
+    prediction_files = sorted(root.rglob(input_pattern))
 
     if args.dry_run:
         for p in prediction_files:
@@ -379,12 +515,20 @@ def main() -> None:
         "generated_at": _now_iso(),
         "files": {},
         "by_language": {},
+        "by_schema": {},
+        "by_language_schema": {},
     }
     by_language = defaultdict(lambda: {"total": 0, "matches": 0, "fail_categories": Counter()})
+    by_schema = defaultdict(lambda: {"total": 0, "matches": 0, "fail_categories": Counter()})
+    by_lang_schema = defaultdict(lambda: {"total": 0, "matches": 0, "fail_categories": Counter()})
 
     for path in prediction_files:
-        analyzed, summary = analyze_file(path, max_entries=args.max_entries)
-        output_path = path.with_name(args.output_suffix)
+        analyzed, summary, fail_groups = analyze_file(
+            path,
+            max_entries=args.max_entries,
+            use_label_as_gold=use_label_as_gold,
+        )
+        output_path = path.with_name(output_suffix)
         write_json(output_path, analyzed)
 
         rel_path = str(path.relative_to(root))
@@ -399,6 +543,29 @@ def main() -> None:
             lang_bucket["matches"] += summary["matches"]
             lang_bucket["fail_categories"].update(summary["fail_categories"])
 
+        schema = _schema_from_path(path, root)
+        if schema:
+            schema_bucket = by_schema[schema]
+            schema_bucket["total"] += summary["total"]
+            schema_bucket["matches"] += summary["matches"]
+            schema_bucket["fail_categories"].update(summary["fail_categories"])
+            if dominant_lang:
+                key = f"{dominant_lang}__{schema}"
+                lang_schema_bucket = by_lang_schema[key]
+                lang_schema_bucket["total"] += summary["total"]
+                lang_schema_bucket["matches"] += summary["matches"]
+                lang_schema_bucket["fail_categories"].update(summary["fail_categories"])
+
+        fail_info_dir = path.parent / fail_info_dirname
+        if fail_info_dir.exists():
+            for existing in fail_info_dir.glob("*.json"):
+                existing.unlink()
+        else:
+            fail_info_dir.mkdir(parents=True, exist_ok=True)
+        for group_key, entries in fail_groups.items():
+            out_path = fail_info_dir / f"{group_key}.json"
+            write_json(out_path, entries)
+
     for lang, stats in by_language.items():
         total = stats["total"]
         matches = stats["matches"]
@@ -408,8 +575,30 @@ def main() -> None:
             "match_rate": (matches / total) if total else 0.0,
             "fail_categories": dict(stats["fail_categories"]),
         }
+    for schema, stats in by_schema.items():
+        total = stats["total"]
+        matches = stats["matches"]
+        global_summary["by_schema"][schema] = {
+            "total": total,
+            "matches": matches,
+            "match_rate": (matches / total) if total else 0.0,
+            "fail_categories": dict(stats["fail_categories"]),
+        }
+    for key, stats in by_lang_schema.items():
+        total = stats["total"]
+        matches = stats["matches"]
+        global_summary["by_language_schema"][key] = {
+            "total": total,
+            "matches": matches,
+            "match_rate": (matches / total) if total else 0.0,
+            "fail_categories": dict(stats["fail_categories"]),
+        }
 
-    summary_path = Path(args.summary_path) if args.summary_path else root / "predictions_test_exec_summary.json"
+    summary_path = (
+        Path(args.summary_path)
+        if args.summary_path
+        else root / mode_defaults["summary_filename"]
+    )
     write_json(summary_path, global_summary)
 
 
