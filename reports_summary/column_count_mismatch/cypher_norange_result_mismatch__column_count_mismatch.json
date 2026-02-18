@@ -1,0 +1,395 @@
+[
+  {
+    "db_id": "concert_singer",
+    "context": "(cypher) Show name, country, age for all singers ordered by age from the oldest to the youngest. | concert_singer | ROOT__singer_in_concert: uri, singer_in_concert__concert_id, singer_in_concert__singer_id, singer_in_concert__CONCERT_ID, singer_in_concert__SINGER_ID | ROOT__concert: uri, concert__stadium_id, concert__year, concert__concert_name, concert__concert_id, concert__theme, concert__STADIUM_ID | ROOT__singer: uri, singer__age, singer__country, singer__singer_id, singer__song_name, singer__name, singer__is_male, singer__song_release_year | ROOT__stadium: uri, stadium__location, stadium__lowest, stadium__stadium_id, stadium__highest, stadium__capacity, stadium__average, stadium__name",
+    "pred_query_processed": "match (T1:ROOT__singer) return T1.singer__name as t1_name, T1.singer__country as t1_country order by T1.singer__age desc",
+    "gold_query_processed": "match (t1:ROOT__singer) return t1.singer__name as t1_name, t1.singer__country as t1_country, t1.singer__age as t1_age order by t1.singer__age desc",
+    "gold_sql_processed": "match (t1:ROOT__singer) return t1.singer__name as t1_name, t1.singer__country as t1_country, t1.singer__age as t1_age order by t1.singer__age desc",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Joe Sharp",
+          "Netherlands"
+        ],
+        [
+          "John Nizinik",
+          "France"
+        ],
+        [
+          "Rose White",
+          "France"
+        ],
+        [
+          "Timbaland",
+          "United States"
+        ],
+        [
+          "Justin Brown",
+          "France"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Joe Sharp",
+          "Netherlands",
+          52
+        ],
+        [
+          "John Nizinik",
+          "France",
+          43
+        ],
+        [
+          "Rose White",
+          "France",
+          41
+        ],
+        [
+          "Timbaland",
+          "United States",
+          32
+        ],
+        [
+          "Justin Brown",
+          "France",
+          29
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "concert_singer",
+    "context": "(cypher) What is the average, minimum, and maximum age of all singers from France? | concert_singer | ROOT__singer_in_concert: uri, singer_in_concert__concert_id, singer_in_concert__singer_id, singer_in_concert__CONCERT_ID, singer_in_concert__SINGER_ID | ROOT__concert: uri, concert__stadium_id, concert__year, concert__concert_name, concert__concert_id, concert__theme, concert__STADIUM_ID | ROOT__singer: uri, singer__age, singer__country, singer__singer_id, singer__song_name, singer__name, singer__is_male, singer__song_release_year | ROOT__stadium: uri, stadium__location, stadium__lowest, stadium__stadium_id, stadium__highest, stadium__capacity, stadium__average, stadium__name",
+    "pred_query_processed": "match (T1:ROOT__singer) where T1.singer__country = 'France' with avg(T1.singer__age) as aggregation_t1_age_93, min(T1.singer__age) as aggregation_t1_age_161 return aggregation_t1_age_93, aggregation_t1_age_161",
+    "gold_query_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "gold_sql_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          34.5,
+          25
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          34.5,
+          25,
+          43
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "concert_singer",
+    "context": "(cypher) What is the average, minimum, and maximum age for all French singers? | concert_singer | ROOT__singer_in_concert: uri, singer_in_concert__concert_id, singer_in_concert__singer_id, singer_in_concert__CONCERT_ID, singer_in_concert__SINGER_ID | ROOT__concert: uri, concert__stadium_id, concert__year, concert__concert_name, concert__concert_id, concert__theme, concert__STADIUM_ID | ROOT__singer: uri, singer__age, singer__country, singer__singer_id, singer__song_name, singer__name, singer__is_male, singer__song_release_year | ROOT__stadium: uri, stadium__location, stadium__lowest, stadium__stadium_id, stadium__highest, stadium__capacity, stadium__average, stadium__name",
+    "pred_query_processed": "match (T1:ROOT__singer) where T1.singer__country = 'Germany' with avg(T1.singer__age) as aggregation_t1_age_31, min(T1.singer__age) as aggregation_t1_age_161 return aggregation_t1_age_31, aggregation_t1_age_161",
+    "gold_query_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "gold_sql_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null,
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          34.5,
+          25,
+          43
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "pets_1",
+    "context": "(cypher) Find the maximum weight for each type of pet. List the maximum weight and pet type. | pets_1 | ROOT__pets: uri, pets__pet_age, pets__pettype, pets__petid, pets__weight | ROOT__student: uri, student__stuid, student__lname, student__advisor, student__city_code, student__major, student__age, student__fname, student__sex | ROOT__has_pet: uri, has_pet__petid, has_pet__stuid, has_pet__PETID, has_pet__STUID",
+    "pred_query_processed": "match (T1:ROOT__pets) with max(T1.pets__weight) as aggregation_t1_weight_56, min(T1.pets__weight) as aggregation_t1_weight_183, T1.pets__pettype as t1_pettype return aggregation_t1_weight_56, aggregation_t1_weight_183, t1_pettype",
+    "gold_query_processed": "match (t1:ROOT__pets) with max(t1.pets__weight) as aggregation_t1_weight_64, t1.pets__pettype as t1_pettype return aggregation_t1_weight_64, t1_pettype",
+    "gold_sql_processed": "match (t1:ROOT__pets) with max(t1.pets__weight) as aggregation_t1_weight_64, t1.pets__pettype as t1_pettype return aggregation_t1_weight_64, t1_pettype",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          13.4,
+          9.3,
+          "dog"
+        ],
+        [
+          12.0,
+          12.0,
+          "cat"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          13.4,
+          "dog"
+        ],
+        [
+          12.0,
+          "cat"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "car_1",
+    "context": "(cypher) What is the maximum horsepower and the make of the car models with 3 cylinders? | car_1 | ROOT__cars_data: uri, cars_data__cylinders, cars_data__weight, cars_data__edispl, cars_data__id, cars_data__year, cars_data__mpg, cars_data__accelerate, cars_data__horsepower, cars_data__ID | ROOT__continents: uri, continents__continent, continents__contid | ROOT__countries: uri, countries__continent, countries__countryid, countries__countryname, countries__CONTINENT | ROOT__car_makers: uri, car_makers__id, car_makers__fullname, car_makers__country, car_makers__maker, car_makers__COUNTRY | ROOT__car_names: uri, car_names__makeid, car_names__make, car_names__model, car_names__MODEL | ROOT__model_list: uri, model_list__model, model_list__modelid, model_list__maker, model_list__MAKER",
+    "pred_query_processed": "match (T1:ROOT__cars_data) with max(T1.cars_data__horsepower) as aggregation_t1_horsepower_178, max(T1.cars_data__horsepower) as aggregation_t1_horsepower_32, min(T1.cars_data__make) as aggregation_t1_make_1 return aggregation_t1_horsepower_178, aggregation_t1_horsepower_32, aggregation_t1_make_1",
+    "gold_query_processed": "match (t1:ROOT__cars_data)-[:cars_data__ID]->(t2:ROOT__car_names) where t1.cars_data__cylinders = 3 return t1.cars_data__horsepower as t1_horsepower, t2.car_names__make as t2_make order by t1.cars_data__horsepower desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__cars_data)-[:cars_data__ID]->(t2:ROOT__car_names) where t1.cars_data__cylinders = 3 return t1.cars_data__horsepower as t1_horsepower, t2.car_names__make as t2_make order by t1.cars_data__horsepower desc limit 1",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "98",
+          "98",
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "97",
+          "mazda rx2 coupe"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "battle_death",
+    "context": "(cypher) List the name, date and result of each battle. | battle_death | ROOT__death: uri, death__note, death__caused_by_ship_id, death__id, death__killed, death__injured, death__CAUSED_BY_SHIP_ID | ROOT__battle: uri, battle__bulgarian_commander, battle__name, battle__date, battle__id, battle__result, battle__latin_commander | ROOT__ship: uri, ship__disposition_of_ship, ship__ship_type, ship__id, ship__tonnage, ship__location, ship__name, ship__lost_in_battle, ship__LOST_IN_BATTLE",
+    "pred_query_processed": "match (T1:ROOT__battle) return T1.battle__name as t1_name, T1.battle__date as t1_date, T1.battle__result as t1_result",
+    "gold_query_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+    "gold_sql_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Battle of Philippopolis",
+          "31 June 1208",
+          "Latin victory"
+        ],
+        [
+          "Siege of Constantinople",
+          "1235",
+          "Two Year Truce"
+        ],
+        [
+          "Battle of Messinopolis",
+          "4 September 1207",
+          "Bulgarian victory"
+        ],
+        [
+          "Battle of Boruy",
+          "June 1205",
+          "Bulgarian victory"
+        ],
+        [
+          "Battle of Rusion",
+          "31 January 1206",
+          "Bulgarian victory"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Battle of Philippopolis",
+          "31 June 1208"
+        ],
+        [
+          "Siege of Constantinople",
+          "1235"
+        ],
+        [
+          "Battle of Messinopolis",
+          "4 September 1207"
+        ],
+        [
+          "Battle of Boruy",
+          "June 1205"
+        ],
+        [
+          "Battle of Rusion",
+          "31 January 1206"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) How many people live in Asia, and what is the largest GNP among them? | world_1 | ROOT__country: uri, country__indepyear, country__continent, country__surfacearea, country__lifeexpectancy, country__name, country__capital, country__governmentform, country__headofstate, country__gnpold, country__code2, country__localname, country__population, country__code, country__gnp, country__region | ROOT__countrylanguage: uri, countrylanguage__countrycode, countrylanguage__percentage, countrylanguage__language, countrylanguage__isofficial, countrylanguage__COUNTRYCODE | ROOT__city: uri, city__population, city__name, city__id, city__district, city__countrycode, city__COUNTRYCODE",
+    "pred_query_processed": "match (T1:ROOT__city)-[:city__COUNTRYCODE]->(T2:ROOT__city) where T2.city__region = 'China' with max(T1.city__lifeexpectancy) as aggregation_t1_lifeexpectancy_182 return aggregation_t1_lifeexpectancy_182",
+    "gold_query_processed": "match (t1:ROOT__country) where t1.country__continent = 'Asia' with sum(t1.country__population) as aggregation_t1_population_200, max(t1.country__gnp) as aggregation_t1_gnp_6 return aggregation_t1_population_200, aggregation_t1_gnp_6",
+    "gold_sql_processed": "match (t1:ROOT__country) where t1.country__continent = 'Asia' with sum(t1.country__population) as aggregation_t1_population_200, max(t1.country__gnp) as aggregation_t1_gnp_6 return aggregation_t1_population_200, aggregation_t1_gnp_6",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          3705025700,
+          3787042.0
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) Find the city with the largest population that uses English. | world_1 | ROOT__country: uri, country__indepyear, country__continent, country__surfacearea, country__lifeexpectancy, country__name, country__capital, country__governmentform, country__headofstate, country__gnpold, country__code2, country__localname, country__population, country__code, country__gnp, country__region | ROOT__countrylanguage: uri, countrylanguage__countrycode, countrylanguage__percentage, countrylanguage__language, countrylanguage__isofficial, countrylanguage__COUNTRYCODE | ROOT__city: uri, city__population, city__name, city__id, city__district, city__countrycode, city__COUNTRYCODE",
+    "pred_query_processed": "match (T1:ROOT__city) where T1.city__population <> 'english' return T1.city__city as t1_city order by T1.city__population desc limit 1",
+    "gold_query_processed": "match (t1:ROOT__city)-[:city__COUNTRYCODE]->(t13:ROOT__country) match (t2:ROOT__countrylanguage)-[:countrylanguage__COUNTRYCODE]->(t13:ROOT__country) where t2.countrylanguage__language = 'English' return t1.city__name as t1_name, t1.city__population as t1_population order by t1.city__population desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__city)-[:city__COUNTRYCODE]->(t13:ROOT__country) match (t2:ROOT__countrylanguage)-[:countrylanguage__COUNTRYCODE]->(t13:ROOT__country) where t2.countrylanguage__language = 'English' return t1.city__name as t1_name, t1.city__population as t1_population order by t1.city__population desc limit 1",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "New York",
+          8008278
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) Return the codes of countries for which Spanish is the predominantly spoken language. | world_1 | ROOT__country: uri, country__indepyear, country__continent, country__surfacearea, country__lifeexpectancy, country__name, country__capital, country__governmentform, country__headofstate, country__gnpold, country__code2, country__localname, country__population, country__code, country__gnp, country__region | ROOT__countrylanguage: uri, countrylanguage__countrycode, countrylanguage__percentage, countrylanguage__language, countrylanguage__isofficial, countrylanguage__COUNTRYCODE | ROOT__city: uri, city__population, city__name, city__id, city__district, city__countrycode, city__COUNTRYCODE",
+    "pred_query_processed": "match (T1:ROOT__countrylanguage) where T1.countrylanguage__language ='Spanish' return T1.countrylanguage__country_code as t1_country_code",
+    "gold_query_processed": "match (T1:ROOT__countrylanguage) where T1.countrylanguage__language = 'Spanish' with max(T1.countrylanguage__percentage) as aggregation_t1_percentage_165, T1.countrylanguage__countrycode as t1_countrycode return t1_countrycode, aggregation_t1_percentage_165",
+    "gold_sql_processed": "match (T1:ROOT__countrylanguage) where T1.countrylanguage__language = 'Spanish' with max(T1.countrylanguage__percentage) as aggregation_t1_percentage_165, T1.countrylanguage__countrycode as t1_countrycode return t1_countrycode, aggregation_t1_percentage_165",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null
+        ],
+        [
+          null
+        ],
+        [
+          null
+        ],
+        [
+          null
+        ],
+        [
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "MEX",
+          92.1
+        ],
+        [
+          "VIR",
+          13.3
+        ],
+        [
+          "DOM",
+          98.0
+        ],
+        [
+          "VEN",
+          96.9
+        ],
+        [
+          "BOL",
+          87.7
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "dog_kennels",
+    "context": "(cypher) Which professionals live in a city containing the substring 'West'? List his or her role, street, city and state. | dog_kennels | ROOT__dogs: uri, dogs__name, dogs__weight, dogs__date_arrived, dogs__date_adopted, dogs__date_departed, dogs__abandoned_yn, dogs__breed_code, dogs__size_code, dogs__date_of_birth, dogs__age, dogs__gender, dogs__DOG_ID, dogs__OWNER_ID | ROOT__sizes: uri, sizes__size_code, sizes__size_description | ROOT__treatments: uri, treatments__treatment_type_code, treatments__cost_of_treatment, treatments__date_of_treatment, treatments__DOG_ID, treatments__PROFESSIONAL_ID, treatments__TREATMENT_ID | ROOT__charges: uri, charges__charge_amount, charges__charge_type, charges__CHARGE_ID | ROOT__treatment_types: uri, treatment_types__treatment_type_description, treatment_types__treatment_type_code | ROOT__owners: uri, owners__cell_number, owners__zip_code, owners__email_address, owners__last_name, owners__home_phone, owners__state, owners__first_name, owners__city, owners__street, owners__OWNER_ID | ROOT__professionals: uri, professionals__last_name, professionals__email_address, professionals__zip_code, professionals__city, professionals__cell_number, professionals__state, professionals__home_phone, professionals__street, professionals__role_code, professionals__first_name ",
+    "pred_query_processed": "match (T1:ROOT__professionals) where T1.professionals__city contains 'West' return T1.professionals__role_code as t1_role_code, T1.professionals__street as t1_street, T1.professionals__state as t1_state",
+    "gold_query_processed": "match (T1:ROOT__professionals) where T1.professionals__city contains 'West' return T1.professionals__role_code as t1_role_code, T1.professionals__street as t1_street, T1.professionals__city as t1_city, T1.professionals__state as t1_state",
+    "gold_sql_processed": "match (T1:ROOT__professionals) where T1.professionals__city contains 'West' return T1.professionals__role_code as t1_role_code, T1.professionals__street as t1_street, T1.professionals__city as t1_city, T1.professionals__state as t1_state",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Employee",
+          "6915 Oberbrunner Point Suite 491\nGleasonville, LA ",
+          "Indiana"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Employee",
+          "6915 Oberbrunner Point Suite 491\nGleasonville, LA ",
+          "West Heidi",
+          "Indiana"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "dog_kennels",
+    "context": "(cypher) Find the role, street, city and state of the professionals living in a city that contains the substring 'West'. | dog_kennels | ROOT__dogs: uri, dogs__name, dogs__weight, dogs__date_arrived, dogs__date_adopted, dogs__date_departed, dogs__abandoned_yn, dogs__breed_code, dogs__size_code, dogs__date_of_birth, dogs__age, dogs__gender, dogs__DOG_ID, dogs__OWNER_ID | ROOT__sizes: uri, sizes__size_code, sizes__size_description | ROOT__treatments: uri, treatments__treatment_type_code, treatments__cost_of_treatment, treatments__date_of_treatment, treatments__DOG_ID, treatments__PROFESSIONAL_ID, treatments__TREATMENT_ID | ROOT__charges: uri, charges__charge_amount, charges__charge_type, charges__CHARGE_ID | ROOT__treatment_types: uri, treatment_types__treatment_type_description, treatment_types__treatment_type_code | ROOT__owners: uri, owners__cell_number, owners__zip_code, owners__email_address, owners__last_name, owners__home_phone, owners__state, owners__first_name, owners__city, owners__street, owners__OWNER_ID | ROOT__professionals: uri, professionals__last_name, professionals__email_address, professionals__zip_code, professionals__city, professionals__cell_number, professionals__state, professionals__home_phone, professionals__street, professionals__role_code, professionals__first_name, professionals",
+    "pred_query_processed": "match (T1:ROOT__professionals) where T1.professionals__city contains 'West' return T1.professionals__role_code as t1_role_code, T1.professionals__street as t1_street, T1.professionals__state as t1_state",
+    "gold_query_processed": "match (T1:ROOT__professionals) where T1.professionals__city contains 'West' return T1.professionals__role_code as t1_role_code, T1.professionals__street as t1_street, T1.professionals__city as t1_city, T1.professionals__state as t1_state",
+    "gold_sql_processed": "match (T1:ROOT__professionals) where T1.professionals__city contains 'West' return T1.professionals__role_code as t1_role_code, T1.professionals__street as t1_street, T1.professionals__city as t1_city, T1.professionals__state as t1_state",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Employee",
+          "6915 Oberbrunner Point Suite 491\nGleasonville, LA ",
+          "Indiana"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Employee",
+          "6915 Oberbrunner Point Suite 491\nGleasonville, LA ",
+          "West Heidi",
+          "Indiana"
+        ]
+      ]
+    }
+  }
+]

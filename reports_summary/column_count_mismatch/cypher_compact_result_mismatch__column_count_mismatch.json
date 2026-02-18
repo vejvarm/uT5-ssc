@@ -1,0 +1,192 @@
+[
+  {
+    "db_id": "battle_death",
+    "context": "(cypher) List the name, date and result of each battle. | battle_death | ROOT__death: uri (String), death__note (String), death__caused_by_ship_id (Long), death__id (Long), death__killed (Long), death__injured (Long), death__CAUSED_BY_SHIP_ID (ROOT__ship) | ROOT__battle: uri (String), battle__bulgarian_commander (String), battle__name (String), battle__date (String), battle__id (Long), battle__result (String), battle__latin_commander (String) | ROOT__ship: uri (String), ship__disposition_of_ship (String), ship__ship_type (String), ship__id (Long), ship__tonnage (String), ship__location (String), ship__name (String), ship__lost_in_battle (Long), ship__LOST_IN_BATTLE (ROOT__battle)",
+    "pred_query_processed": "match (T1:ROOT__battle) return T1.battle__name as t1_name, T1.battle__date as t1_date, T1.battle__result as t1_result",
+    "gold_query_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+    "gold_sql_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Battle of Philippopolis",
+          "31 June 1208",
+          "Latin victory"
+        ],
+        [
+          "Siege of Constantinople",
+          "1235",
+          "Two Year Truce"
+        ],
+        [
+          "Battle of Messinopolis",
+          "4 September 1207",
+          "Bulgarian victory"
+        ],
+        [
+          "Battle of Boruy",
+          "June 1205",
+          "Bulgarian victory"
+        ],
+        [
+          "Battle of Rusion",
+          "31 January 1206",
+          "Bulgarian victory"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Battle of Philippopolis",
+          "31 June 1208"
+        ],
+        [
+          "Siege of Constantinople",
+          "1235"
+        ],
+        [
+          "Battle of Messinopolis",
+          "4 September 1207"
+        ],
+        [
+          "Battle of Boruy",
+          "June 1205"
+        ],
+        [
+          "Battle of Rusion",
+          "31 January 1206"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) Find the city with the largest population that uses English. | world_1 | ROOT__country: uri (String), country__indepyear (Long), country__continent (String), country__surfacearea (Double), country__lifeexpectancy (Double), country__name (String), country__capital (Long), country__governmentform (String), country__headofstate (String), country__gnpold (Double), country__code2 (String), country__localname (String), country__population (Long), country__code (String), country__gnp (Double), country__region (String) | ROOT__countrylanguage: uri (String), countrylanguage__countrycode (String), countrylanguage__percentage (Double), countrylanguage__language (String), countrylanguage__isofficial (String), countrylanguage__COUNTRYCODE (ROOT__country) | ROOT__city: uri (String), city__population (Long), city__name (String), city__id (Long), city__district (String), city__countrycode (String), city__COUNTRYCODE (ROOT__country)",
+    "pred_query_processed": "match (T1:ROOT__city) return T1.city__city as t1_city order by T1.city__population desc limit 1",
+    "gold_query_processed": "match (t1:ROOT__city)-[:city__COUNTRYCODE]->(t13:ROOT__country) match (t2:ROOT__countrylanguage)-[:countrylanguage__COUNTRYCODE]->(t13:ROOT__country) where t2.countrylanguage__language = 'English' return t1.city__name as t1_name, t1.city__population as t1_population order by t1.city__population desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__city)-[:city__COUNTRYCODE]->(t13:ROOT__country) match (t2:ROOT__countrylanguage)-[:countrylanguage__COUNTRYCODE]->(t13:ROOT__country) where t2.countrylanguage__language = 'English' return t1.city__name as t1_name, t1.city__population as t1_population order by t1.city__population desc limit 1",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "New York",
+          8008278
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) Find the name, population and expected life length of asian country with the largest area? | world_1 | ROOT__country: uri (String), country__indepyear (Long), country__continent (String), country__surfacearea (Double), country__lifeexpectancy (Double), country__name (String), country__capital (Long), country__governmentform (String), country__headofstate (String), country__gnpold (Double), country__code2 (String), country__localname (String), country__population (Long), country__code (String), country__gnp (Double), country__region (String) | ROOT__countrylanguage: uri (String), countrylanguage__countrycode (String), countrylanguage__percentage (Double), countrylanguage__language (String), countrylanguage__isofficial (String), countrylanguage__COUNTRYCODE (ROOT__country) | ROOT__city: uri (String), city__population (Long), city__name (String), city__id (Long), city__district (String), city__countrycode (String), city__COUNTRYCODE (ROOT__country)",
+    "pred_query_processed": "match (T1:ROOT__country) return T1.country__name as t1_name, T1.country__population as t1_population order by T1.country__surfacearea desc limit 1",
+    "gold_query_processed": "match (t1:ROOT__country) where t1.country__continent = 'Asia' return t1.country__name as t1_name, t1.country__population as t1_population, t1.country__lifeexpectancy as t1_lifeexpectancy order by t1.country__surfacearea desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__country) where t1.country__continent = 'Asia' return t1.country__name as t1_name, t1.country__population as t1_population, t1.country__lifeexpectancy as t1_lifeexpectancy order by t1.country__surfacearea desc limit 1",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Russian Federation",
+          146934000
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "China",
+          1277558000,
+          71.4
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) What are the name, population, and life expectancy of the largest Asian country by land? | world_1 | ROOT__country: uri (String), country__indepyear (Long), country__continent (String), country__surfacearea (Double), country__lifeexpectancy (Double), country__name (String), country__capital (Long), country__governmentform (String), country__headofstate (String), country__gnpold (Double), country__code2 (String), country__localname (String), country__population (Long), country__code (String), country__gnp (Double), country__region (String) | ROOT__countrylanguage: uri (String), countrylanguage__countrycode (String), countrylanguage__percentage (Double), countrylanguage__language (String), countrylanguage__isofficial (String), countrylanguage__COUNTRYCODE (ROOT__country) | ROOT__city: uri (String), city__population (Long), city__name (String), city__id (Long), city__district (String), city__countrycode (String), city__COUNTRYCODE (ROOT__country)",
+    "pred_query_processed": "match (T1:ROOT__country) return T1.country__name as t1_name, T1.country__lifeexpectancy as t1_lifeexpectancy order by T1.country__surfacearea desc limit 1",
+    "gold_query_processed": "match (t1:ROOT__country) where t1.country__continent = 'Asia' return t1.country__name as t1_name, t1.country__population as t1_population, t1.country__lifeexpectancy as t1_lifeexpectancy order by t1.country__surfacearea desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__country) where t1.country__continent = 'Asia' return t1.country__name as t1_name, t1.country__population as t1_population, t1.country__lifeexpectancy as t1_lifeexpectancy order by t1.country__surfacearea desc limit 1",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Russian Federation",
+          67.2
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "China",
+          1277558000,
+          71.4
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) Return the codes of countries for which Spanish is the predominantly spoken language. | world_1 | ROOT__country: uri (String), country__indepyear (Long), country__continent (String), country__surfacearea (Double), country__lifeexpectancy (Double), country__name (String), country__capital (Long), country__governmentform (String), country__headofstate (String), country__gnpold (Double), country__code2 (String), country__localname (String), country__population (Long), country__code (String), country__gnp (Double), country__region (String) | ROOT__countrylanguage: uri (String), countrylanguage__countrycode (String), countrylanguage__percentage (Double), countrylanguage__language (String), countrylanguage__isofficial (String), countrylanguage__COUNTRYCODE (ROOT__country) | ROOT__city: uri (String), city__population (Long), city__name (String), city__id (Long), city__district (String), city__countrycode (String), city__COUNTRYCODE (ROOT__country)",
+    "pred_query_processed": "match (T1:ROOT__countrylanguage) where T1.countrylanguage__language ='Spanish' return T1.countrylanguage__countrycode as t1_countrycode",
+    "gold_query_processed": "match (T1:ROOT__countrylanguage) where T1.countrylanguage__language = 'Spanish' with max(T1.countrylanguage__percentage) as aggregation_t1_percentage_165, T1.countrylanguage__countrycode as t1_countrycode return t1_countrycode, aggregation_t1_percentage_165",
+    "gold_sql_processed": "match (T1:ROOT__countrylanguage) where T1.countrylanguage__language = 'Spanish' with max(T1.countrylanguage__percentage) as aggregation_t1_percentage_165, T1.countrylanguage__countrycode as t1_countrycode return t1_countrycode, aggregation_t1_percentage_165",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "MEX"
+        ],
+        [
+          "VIR"
+        ],
+        [
+          "DOM"
+        ],
+        [
+          "VEN"
+        ],
+        [
+          "BOL"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "MEX",
+          92.1
+        ],
+        [
+          "VIR",
+          13.3
+        ],
+        [
+          "DOM",
+          98.0
+        ],
+        [
+          "VEN",
+          96.9
+        ],
+        [
+          "BOL",
+          87.7
+        ]
+      ]
+    }
+  }
+]

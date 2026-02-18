@@ -52,7 +52,7 @@ docker start neo4j_server
 # python -m seq2seq.run_seq2seq configs/10_train_t5-single/sparql_norange.json  # DONE
 # python -m seq2seq.run_seq2seq configs/10_train_t5-single/sparql_compact.json  # DONE
 # python -m seq2seq.run_seq2seq configs/10_train_t5-single/sql_compact.json  # DONE
-python -m seq2seq.run_seq2seq configs/10_train_t5-single/sql_norange.json  # TODO
-python -m seq2seq.run_seq2seq configs/10_train_t5-single/sql_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/10_train_t5-single/sql_norange.json  # DONE
+# python -m seq2seq.run_seq2seq configs/10_train_t5-single/sql_no-schema.json   # DONE
 # python -m seq2seq.run_seq2seq configs/10_train_t5-single/sparql_no-schema.json  # DONE
-python -m seq2seq.run_seq2seq configs/10_train_t5-single/cypher_no-schema.json   # TODO
+# python -m seq2seq.run_seq2seq configs/10_train_t5-single/cypher_no-schema.json   # DONE

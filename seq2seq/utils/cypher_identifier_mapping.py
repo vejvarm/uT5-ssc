@@ -4,8 +4,10 @@ from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 TOKEN_BOUNDARY = r"[A-Za-z0-9_]"
-CONTEXT_LABEL = "label"
+CONTEXT_NODE_LABEL = "node_label"
+CONTEXT_RELATIONSHIP_TYPE = "relationship_type"
 CONTEXT_PROPERTY = "property"
+CONTEXT_LEGACY_LABEL = "label"
 
 TYPE_NORMALIZATION_MAP = {
     "String": "str",
@@ -26,13 +28,27 @@ def _build_token_pattern(tokens: Iterable[str]) -> Optional[re.Pattern]:
     return re.compile(rf"(?<!{TOKEN_BOUNDARY})(?:{joined})(?!{TOKEN_BOUNDARY})")
 
 
-def _build_label_pattern(tokens: Iterable[str]) -> Optional[re.Pattern]:
+def _build_node_label_pattern(tokens: Iterable[str]) -> Optional[re.Pattern]:
     escaped = [re.escape(tok) for tok in tokens if tok]
     if not escaped:
         return None
     escaped.sort(key=len, reverse=True)
     joined = "|".join(escaped)
-    return re.compile(rf"(?P<prefix>:\s*`?)(?P<token>{joined})(?P<suffix>`?)")
+    # Match complete label tokens only (prevents partial matches like `:course` in `:course__ID`).
+    return re.compile(rf"(?P<prefix>:\s*`?)(?P<token>{joined})(?P<suffix>`?)(?!{TOKEN_BOUNDARY})")
+
+
+def _build_relationship_type_pattern(tokens: Iterable[str]) -> Optional[re.Pattern]:
+    escaped = [re.escape(tok) for tok in tokens if tok]
+    if not escaped:
+        return None
+    escaped.sort(key=len, reverse=True)
+    joined = "|".join(escaped)
+    # Match relationship types in `[:TYPE]`, `[r:TYPE]`, and alternates like `[:A|B]`.
+    return re.compile(
+        rf"(?P<prefix>(?:\[\s*(?:[A-Za-z_][A-Za-z0-9_]*\s*)?:\s*`?|\|\s*`?))"
+        rf"(?P<token>{joined})(?P<suffix>`?)(?!{TOKEN_BOUNDARY})"
+    )
 
 
 def _build_property_accessor_pattern(tokens: Iterable[str]) -> Optional[re.Pattern]:
@@ -108,6 +124,145 @@ def _replace_with_pattern(text: str, mapping: Dict[str, str], pattern: Optional[
         return f"{match.group('prefix')}{replacement}{match.group('suffix')}"
 
     return pattern.sub(_repl, text)
+
+
+def _replace_with_pattern_outside_string_literals(
+    text: str,
+    mapping: Dict[str, str],
+    pattern: Optional[re.Pattern],
+) -> str:
+    if not text or not mapping or pattern is None:
+        return text
+
+    result: List[str] = []
+    buffer: List[str] = []
+    quote_char: Optional[str] = None
+    escape = False
+
+    for ch in text:
+        if quote_char:
+            result.append(ch)
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == quote_char:
+                quote_char = None
+            continue
+
+        if ch in ("'", '"'):
+            if buffer:
+                result.append(_replace_with_pattern("".join(buffer), mapping, pattern))
+                buffer = []
+            result.append(ch)
+            quote_char = ch
+            continue
+
+        buffer.append(ch)
+
+    if buffer:
+        result.append(_replace_with_pattern("".join(buffer), mapping, pattern))
+
+    return "".join(result)
+
+
+def _find_relationship_pattern_ranges(text: str) -> List[Tuple[int, int]]:
+    if not text:
+        return []
+
+    ranges: List[Tuple[int, int]] = []
+    quote_char: Optional[str] = None
+    escape = False
+    i = 0
+    length = len(text)
+
+    while i < length:
+        ch = text[i]
+        if quote_char:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == quote_char:
+                quote_char = None
+            i += 1
+            continue
+
+        if ch in ("'", '"'):
+            quote_char = ch
+            i += 1
+            continue
+
+        if ch == "[":
+            j = i - 1
+            while j >= 0 and text[j].isspace():
+                j -= 1
+            if j >= 0 and text[j] == "-":
+                k = i + 1
+                inner_quote: Optional[str] = None
+                inner_escape = False
+                while k < length:
+                    inner = text[k]
+                    if inner_quote:
+                        if inner_escape:
+                            inner_escape = False
+                        elif inner == "\\":
+                            inner_escape = True
+                        elif inner == inner_quote:
+                            inner_quote = None
+                        k += 1
+                        continue
+
+                    if inner in ("'", '"'):
+                        inner_quote = inner
+                    elif inner == "]":
+                        ranges.append((i, k + 1))
+                        i = k
+                        break
+                    k += 1
+
+        i += 1
+
+    return ranges
+
+
+def _replace_query_contexts(
+    text: str,
+    node_label_mapping: Dict[str, str],
+    relationship_type_mapping: Dict[str, str],
+    node_label_pattern: Optional[re.Pattern],
+    relationship_type_pattern: Optional[re.Pattern],
+) -> str:
+    if not text:
+        return text
+
+    rel_ranges = _find_relationship_pattern_ranges(text)
+    if not rel_ranges:
+        return _replace_with_pattern_outside_string_literals(text, node_label_mapping, node_label_pattern)
+
+    chunks: List[str] = []
+    cursor = 0
+    for start, end in rel_ranges:
+        if cursor < start:
+            outside = text[cursor:start]
+            outside = _replace_with_pattern_outside_string_literals(outside, node_label_mapping, node_label_pattern)
+            chunks.append(outside)
+
+        rel_segment = text[start:end]
+        rel_segment = _replace_with_pattern_outside_string_literals(
+            rel_segment,
+            relationship_type_mapping,
+            relationship_type_pattern,
+        )
+        chunks.append(rel_segment)
+        cursor = end
+
+    if cursor < len(text):
+        tail = text[cursor:]
+        tail = _replace_with_pattern_outside_string_literals(tail, node_label_mapping, node_label_pattern)
+        chunks.append(tail)
+
+    return "".join(chunks)
 
 
 def strip_cypher_identifier(identifier: str) -> str:
@@ -210,10 +365,30 @@ class IdentifierMapping:
         self._schema_shorten_pattern = _build_token_pattern(self._forward_all.keys())
         self._schema_restore_pattern = _build_token_pattern(self._reverse_all.keys())
 
-        labels_forward = self.forward_by_context.get(CONTEXT_LABEL, {})
-        labels_reverse = self.reverse_by_context.get(CONTEXT_LABEL, {})
-        self._label_shorten_pattern = _build_label_pattern(labels_forward.keys())
-        self._label_restore_pattern = _build_label_pattern(labels_reverse.keys())
+        node_labels_forward = dict(self.forward_by_context.get(CONTEXT_NODE_LABEL, {}))
+        relationship_types_forward = dict(self.forward_by_context.get(CONTEXT_RELATIONSHIP_TYPE, {}))
+        node_labels_reverse = dict(self.reverse_by_context.get(CONTEXT_NODE_LABEL, {}))
+        relationship_types_reverse = dict(self.reverse_by_context.get(CONTEXT_RELATIONSHIP_TYPE, {}))
+
+        # Backward compatibility for cached payloads produced before context splitting.
+        # Legacy `label` mixed node labels and relationship types into one context.
+        if not node_labels_forward and not relationship_types_forward and CONTEXT_LEGACY_LABEL in self.forward_by_context:
+            legacy_forward = dict(self.forward_by_context.get(CONTEXT_LEGACY_LABEL, {}))
+            legacy_reverse = dict(self.reverse_by_context.get(CONTEXT_LEGACY_LABEL, {}))
+            node_labels_forward = legacy_forward
+            relationship_types_forward = legacy_forward
+            node_labels_reverse = legacy_reverse
+            relationship_types_reverse = legacy_reverse
+
+        self._node_label_forward = node_labels_forward
+        self._node_label_reverse = node_labels_reverse
+        self._relationship_type_forward = relationship_types_forward
+        self._relationship_type_reverse = relationship_types_reverse
+
+        self._node_label_shorten_pattern = _build_node_label_pattern(self._node_label_forward.keys())
+        self._node_label_restore_pattern = _build_node_label_pattern(self._node_label_reverse.keys())
+        self._relationship_type_shorten_pattern = _build_relationship_type_pattern(self._relationship_type_forward.keys())
+        self._relationship_type_restore_pattern = _build_relationship_type_pattern(self._relationship_type_reverse.keys())
 
         props_forward = self.forward_by_context.get(CONTEXT_PROPERTY, {})
         props_reverse = self.reverse_by_context.get(CONTEXT_PROPERTY, {})
@@ -229,14 +404,26 @@ class IdentifierMapping:
         return _replace_outside_string_literals(text, self._reverse_all, self._schema_restore_pattern)
 
     def shorten_query(self, text: str) -> str:
-        text = _replace_with_pattern(text, self.forward_by_context.get(CONTEXT_LABEL, {}), self._label_shorten_pattern)
+        text = _replace_query_contexts(
+            text,
+            node_label_mapping=self._node_label_forward,
+            relationship_type_mapping=self._relationship_type_forward,
+            node_label_pattern=self._node_label_shorten_pattern,
+            relationship_type_pattern=self._relationship_type_shorten_pattern,
+        )
         property_mapping = self.forward_by_context.get(CONTEXT_PROPERTY, {})
         text = _replace_with_pattern(text, property_mapping, self._prop_accessor_shorten_pattern)
         text = _replace_with_pattern(text, property_mapping, self._prop_map_shorten_pattern)
         return text
 
     def restore_query(self, text: str) -> str:
-        text = _replace_with_pattern(text, self.reverse_by_context.get(CONTEXT_LABEL, {}), self._label_restore_pattern)
+        text = _replace_query_contexts(
+            text,
+            node_label_mapping=self._node_label_reverse,
+            relationship_type_mapping=self._relationship_type_reverse,
+            node_label_pattern=self._node_label_restore_pattern,
+            relationship_type_pattern=self._relationship_type_restore_pattern,
+        )
         property_mapping = self.reverse_by_context.get(CONTEXT_PROPERTY, {})
         text = _replace_with_pattern(text, property_mapping, self._prop_accessor_restore_pattern)
         text = _replace_with_pattern(text, property_mapping, self._prop_map_restore_pattern)
@@ -313,12 +500,13 @@ class CypherIdentifierMappingBuilder:
             return IdentifierMapping()
         if strategy == "strip_prefix":
             shorteners: Dict[str, Callable[[str], str]] = {
-                CONTEXT_LABEL: strip_cypher_identifier,
+                CONTEXT_NODE_LABEL: strip_cypher_identifier,
+                CONTEXT_RELATIONSHIP_TYPE: strip_cypher_identifier,
                 CONTEXT_PROPERTY: strip_cypher_identifier,
             }
         elif strategy == "strip_root_only":
             shorteners = {
-                CONTEXT_LABEL: strip_root_prefix,
+                CONTEXT_NODE_LABEL: strip_root_prefix,
             }
         else:
             raise ValueError(f"Unsupported Cypher identifier mapping strategy `{strategy}`.")
@@ -363,31 +551,32 @@ class CypherIdentifierMappingBuilder:
 
     def _collect_candidates(self, schema: dict) -> Dict[str, List[str]]:
         contexts: Dict[str, List[str]] = {
-            CONTEXT_LABEL: [],
+            CONTEXT_NODE_LABEL: [],
+            CONTEXT_RELATIONSHIP_TYPE: [],
             CONTEXT_PROPERTY: [],
         }
 
-        contexts[CONTEXT_LABEL].extend(schema.get("NodeLabels", []))
-        contexts[CONTEXT_LABEL].extend(schema.get("RelationshipLabels", []))
+        contexts[CONTEXT_NODE_LABEL].extend(schema.get("NodeLabels", []))
+        contexts[CONTEXT_RELATIONSHIP_TYPE].extend(schema.get("RelationshipLabels", []))
 
         for entry in schema.get("NodeProperties", []):
-            contexts[CONTEXT_LABEL].append(entry.get("nodeName", ""))
+            contexts[CONTEXT_NODE_LABEL].append(entry.get("nodeName", ""))
             contexts[CONTEXT_PROPERTY].append(entry.get("propertyName", ""))
 
         for rel in schema.get("Relationships", []):
-            contexts[CONTEXT_LABEL].append(rel.get("relationshipType", ""))
-            contexts[CONTEXT_LABEL].extend(rel.get("startNodeLabels", []))
-            contexts[CONTEXT_LABEL].extend(rel.get("endNodeLabels", []))
+            contexts[CONTEXT_RELATIONSHIP_TYPE].append(rel.get("relationshipType", ""))
+            contexts[CONTEXT_NODE_LABEL].extend(rel.get("startNodeLabels", []))
+            contexts[CONTEXT_NODE_LABEL].extend(rel.get("endNodeLabels", []))
 
         rel_props = schema.get("RelationshipProperties", [])
         if isinstance(rel_props, dict):
             for rel_name, props in rel_props.items():
-                contexts[CONTEXT_LABEL].append(rel_name)
+                contexts[CONTEXT_RELATIONSHIP_TYPE].append(rel_name)
                 for prop in props:
                     contexts[CONTEXT_PROPERTY].append(prop.get("propertyName", ""))
         else:
             for entry in rel_props:
-                contexts[CONTEXT_LABEL].append(entry.get("relName", ""))
+                contexts[CONTEXT_RELATIONSHIP_TYPE].append(entry.get("relName", ""))
                 contexts[CONTEXT_PROPERTY].append(entry.get("propertyName", ""))
 
         for ctx, tokens in contexts.items():

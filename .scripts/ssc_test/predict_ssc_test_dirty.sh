@@ -64,9 +64,9 @@ docker start neo4j_server_ssc_test
 # python -m seq2seq.run_seq2seq configs/8_predict/dirty/sql_norange.json
 # python -m seq2seq.run_seq2seq configs/8_predict/dirty/sparql_norange.json
 # python -m seq2seq.run_seq2seq configs/8_predict/dirty/cypher_norange.json
-python -m seq2seq.run_seq2seq configs/8_predict/dirty/sql_compact.json  # DONE
-python -m seq2seq.run_seq2seq configs/8_predict/dirty/sparql_compact.json  # DONE
-# python -m seq2seq.run_seq2seq configs/8_predict/dirty/cypher_compact.json  
+python -m seq2seq.run_seq2seq configs/8_predict/dirty/sql_compact.json
+python -m seq2seq.run_seq2seq configs/8_predict/dirty/sparql_compact.json
+python -m seq2seq.run_seq2seq configs/8_predict/dirty/cypher_compact.json  
 # python -m seq2seq.run_seq2seq configs/8_predict/dirty/sql_no-schema.json
 # python -m seq2seq.run_seq2seq configs/8_predict/dirty/sparql_no-schema.json 
 # python -m seq2seq.run_seq2seq configs/8_predict/dirty/cypher_no-schema.json 

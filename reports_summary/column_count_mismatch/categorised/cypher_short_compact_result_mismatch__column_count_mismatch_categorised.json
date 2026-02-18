@@ -1,0 +1,94 @@
+{
+  "Missing Property Column": [
+    {
+      "db_id": "concert_singer",
+      "context": "(cypher) What is the average, minimum, and maximum age of all singers from France? | concert_singer | singer_in_concert: CONCERT_ID (concert), SINGER_ID (singer) | concert: year (str), concert_name (str), concert_id (int), theme (str), STADIUM_ID (stadium) | singer: age (int), country (str), singer_id (int), song_name (str), name (str), is_male (bool), song_release_year (str) | stadium: location (str), lowest (int), stadium_id (int), highest (int), capacity (int), average (int), stadium__name (str)",
+      "pred_query_processed": "match (T1:ROOT__singer) where T1.singer__country = 'France' with avg(T1.singer__age) as aggregation_t1_age_93, min(T1.singer__age) as aggregation_t1_age_161 return aggregation_t1_age_93, aggregation_t1_age_161",
+      "gold_query_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+      "gold_sql_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+      "pred_exec": {
+        "status": "result",
+        "normalized_rows": [
+          [
+            34.5,
+            25
+          ]
+        ]
+      },
+      "gold_exec": {
+        "status": "result",
+        "normalized_rows": [
+          [
+            34.5,
+            25,
+            43
+          ]
+        ]
+      }
+    }
+  ],
+  "Extra Property Column": [
+    {
+      "db_id": "battle_death",
+      "context": "(cypher) List the name, date and result of each battle. | battle_death | death: note (str), death__id (int), killed (int), injured (int), CAUSED_BY_SHIP_ID (ship) | battle: bulgarian_commander (str), battle__name (str), date (str), battle__id (int), result (str), latin_commander (str) | ship: disposition_of_ship (str), ship_type (str), id (int), tonnage (str), location (str), name (str), LOST_IN_BATTLE (battle)",
+      "pred_query_processed": "match (T1:ROOT__battle) return T1.battle__name as t1_name, T1.battle__date as t1_date, T1.battle__result as t1_result",
+      "gold_query_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+      "gold_sql_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+      "pred_exec": {
+        "status": "result",
+        "normalized_rows": [
+          [
+            "Battle of Philippopolis",
+            "31 June 1208",
+            "Latin victory"
+          ],
+          [
+            "Siege of Constantinople",
+            "1235",
+            "Two Year Truce"
+          ],
+          [
+            "Battle of Messinopolis",
+            "4 September 1207",
+            "Bulgarian victory"
+          ],
+          [
+            "Battle of Boruy",
+            "June 1205",
+            "Bulgarian victory"
+          ],
+          [
+            "Battle of Rusion",
+            "31 January 1206",
+            "Bulgarian victory"
+          ]
+        ]
+      },
+      "gold_exec": {
+        "status": "result",
+        "normalized_rows": [
+          [
+            "Battle of Philippopolis",
+            "31 June 1208"
+          ],
+          [
+            "Siege of Constantinople",
+            "1235"
+          ],
+          [
+            "Battle of Messinopolis",
+            "4 September 1207"
+          ],
+          [
+            "Battle of Boruy",
+            "June 1205"
+          ],
+          [
+            "Battle of Rusion",
+            "31 January 1206"
+          ]
+        ]
+      }
+    }
+  ]
+}

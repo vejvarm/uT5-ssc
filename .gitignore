@@ -26,3 +26,5 @@ data/
 *.log
 eval_scores_*.json
 .scripts/setup_remote*.sh
+
+*.csv

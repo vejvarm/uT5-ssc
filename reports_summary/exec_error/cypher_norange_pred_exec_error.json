@@ -1,0 +1,821 @@
+[
+  {
+    "db_id": "pets_1",
+    "context": "(cypher) List the maximum weight and type for each type of pet. | pets_1 | ROOT__pets: uri, pets__pet_age, pets__pettype, pets__petid, pets__weight | ROOT__student: uri, student__stuid, student__lname, student__advisor, student__city_code, student__major, student__age, student__fname, student__sex | ROOT__has_pet: uri, has_pet__petid, has_pet__stuid, has_pet__PETID, has_pet__STUID",
+    "pred_query_processed": "match (T1:ROOT__pets) with max(T1.pets__weight) as aggregation_t1_weight_56, max(T1.pets__pettype) as aggregation_t1_pettype_108, T1.pets__pettype as t1_pettype return aggregation_t1_weight_56, aggregation_t1_weight_108, t1_pettype_108",
+    "gold_query_processed": "match (t1:ROOT__pets) with max(t1.pets__weight) as aggregation_t1_weight_64, t1.pets__pettype as t1_pettype return aggregation_t1_weight_64, t1_pettype",
+    "gold_sql_processed": "match (t1:ROOT__pets) with max(t1.pets__weight) as aggregation_t1_weight_64, t1.pets__pettype as t1_pettype return aggregation_t1_weight_64, t1_pettype",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `aggregation_t1_weight_108` not defined (line 1, column 195 (offset: 194))\n\"match (T1:ROOT__pets) with max(T1.pets__weight) as aggregation_t1_weight_56, max(T1.pets__pettype) as aggregation_t1_pettype_108, T1.pets__pettype as t1_pettype return aggregation_t1_weight_56, aggregation_t1_weight_108, t1_pettype_108\"\n                                                                                                                                                                                                   ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Variable `aggregation_t1_weight_108` not defined (line 1, column 195 (offset: 194))\n\"match (T1:ROOT__pets) with max(T1.pets__weight) as aggregation_t1_weight_56, max(T1.pets__pettype) as aggregation_t1_pettype_108, T1.pets__pettype as t1_pettype return aggregation_t1_weight_56, aggregation_t1_weight_108, t1_pettype_108\"\n                                                                                                                                                                                                   ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          13.4,
+          "dog"
+        ],
+        [
+          12.0,
+          "cat"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "pets_1",
+    "context": "(cypher) Find the average and maximum age for each type of pet. | pets_1 | ROOT__pets: uri, pets__pet_age, pets__pettype, pets__petid, pets__weight | ROOT__student: uri, student__stuid, student__lname, student__advisor, student__city_code, student__major, student__age, student__fname, student__sex | ROOT__has_pet: uri, has_pet__petid, has_pet__stuid, has_pet__PETID, has_pet__STUID",
+    "pred_query_processed": "match (T1:ROOT__pets) with avg(T1.pets__age) as aggregation_t1_age_93, max(T1.pets__age) as aggregation_t1_age_145, T1.pets__pettype as t1_pettype return t1_pettype, aggregation_t1_age_145, t1_pettype",
+    "gold_query_processed": "match (t1:ROOT__pets) with avg(t1.pets__pet_age) as aggregation_t1_pet_age_2, max(t1.pets__pet_age) as aggregation_t1_pet_age_13, t1.pets__pettype as t1_pettype return aggregation_t1_pet_age_2, aggregation_t1_pet_age_13, t1_pettype",
+    "gold_sql_processed": "match (t1:ROOT__pets) with avg(t1.pets__pet_age) as aggregation_t1_pet_age_2, max(t1.pets__pet_age) as aggregation_t1_pet_age_13, t1.pets__pettype as t1_pettype return aggregation_t1_pet_age_2, aggregation_t1_pet_age_13, t1_pettype",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 155 (offset: 154))\n\"match (T1:ROOT__pets) with avg(T1.pets__age) as aggregation_t1_age_93, max(T1.pets__age) as aggregation_t1_age_145, T1.pets__pettype as t1_pettype return t1_pettype, aggregation_t1_age_145, t1_pettype\"\n                                                                                                                                                           ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 155 (offset: 154))\n\"match (T1:ROOT__pets) with avg(T1.pets__age) as aggregation_t1_age_93, max(T1.pets__age) as aggregation_t1_age_145, T1.pets__pettype as t1_pettype return t1_pettype, aggregation_t1_age_145, t1_pettype\"\n                                                                                                                                                           ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          1.5,
+          2,
+          "dog"
+        ],
+        [
+          3.0,
+          3,
+          "cat"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "car_1",
+    "context": "(cypher) What are the countries having at least one car maker? List name and id. | car_1 | ROOT__cars_data: uri, cars_data__cylinders, cars_data__weight, cars_data__edispl, cars_data__id, cars_data__year, cars_data__mpg, cars_data__accelerate, cars_data__horsepower, cars_data__ID | ROOT__continents: uri, continents__continent, continents__contid | ROOT__countries: uri, countries__continent, countries__countryid, countries__countryname, countries__CONTINENT | ROOT__car_makers: uri, car_makers__id, car_makers__fullname, car_makers__country, car_makers__maker, car_makers__COUNTRY | ROOT__car_names: uri, car_names__makeid, car_names__make, car_names__model, car_names__MODEL | ROOT__model_list: uri, model_list__model, model_list__modelid, model_list__maker, model_list__MAKER",
+    "pred_query_processed": "match (T1:ROOT__car_makers) with T1.car_makers__country as t1_country, count(*) as agg__0 where agg__0 >= 1 return t1_country, t1_country",
+    "gold_query_processed": "match (t2:ROOT__car_makers)-[:car_makers__COUNTRY]->(t1:ROOT__countries) with t1.countries__countryname as t1_countryname, t1.countries__countryid as t1_countryid, count(*) as agg__0 where agg__0 >= 1 return t1_countryname, t1_countryid",
+    "gold_sql_processed": "match (t2:ROOT__car_makers)-[:car_makers__COUNTRY]->(t1:ROOT__countries) with t1.countries__countryname as t1_countryname, t1.countries__countryid as t1_countryid, count(*) as agg__0 where agg__0 >= 1 return t1_countryname, t1_countryid",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 116 (offset: 115))\n\"match (T1:ROOT__car_makers) with T1.car_makers__country as t1_country, count(*) as agg__0 where agg__0 >= 1 return t1_country, t1_country\"\n                                                                                                                    ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 116 (offset: 115))\n\"match (T1:ROOT__car_makers) with T1.car_makers__country as t1_country, count(*) as agg__0 where agg__0 >= 1 return t1_country, t1_country\"\n                                                                                                                    ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "sweden",
+          6
+        ],
+        [
+          "italy",
+          5
+        ],
+        [
+          "korea",
+          8
+        ],
+        [
+          "uk",
+          7
+        ],
+        [
+          "germany",
+          2
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "car_1",
+    "context": "(cypher) What are the names and ids of all countries with at least one car maker? | car_1 | ROOT__cars_data: uri, cars_data__cylinders, cars_data__weight, cars_data__edispl, cars_data__id, cars_data__year, cars_data__mpg, cars_data__accelerate, cars_data__horsepower, cars_data__ID | ROOT__continents: uri, continents__continent, continents__contid | ROOT__countries: uri, countries__continent, countries__countryid, countries__countryname, countries__CONTINENT | ROOT__car_makers: uri, car_makers__id, car_makers__fullname, car_makers__country, car_makers__maker, car_makers__COUNTRY | ROOT__car_names: uri, car_names__makeid, car_names__make, car_names__model, car_names__MODEL | ROOT__model_list: uri, model_list__model, model_list__modelid, model_list__maker, model_list__MAKER",
+    "pred_query_processed": "match (T1:ROOT__car_makers) with T1.car_makers__country as t1_country, T1.car_makers__country as t1_country, count(*) as agg__0 where agg__0 >= 1 return t1_country, t1_country",
+    "gold_query_processed": "match (t2:ROOT__car_makers)-[:car_makers__COUNTRY]->(t1:ROOT__countries) with t1.countries__countryname as t1_countryname, t1.countries__countryid as t1_countryid, count(*) as agg__0 where agg__0 >= 1 return t1_countryname, t1_countryid",
+    "gold_sql_processed": "match (t2:ROOT__car_makers)-[:car_makers__COUNTRY]->(t1:ROOT__countries) with t1.countries__countryname as t1_countryname, t1.countries__countryid as t1_countryid, count(*) as agg__0 where agg__0 >= 1 return t1_countryname, t1_countryid",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 34 (offset: 33))\n\"match (T1:ROOT__car_makers) with T1.car_makers__country as t1_country, T1.car_makers__country as t1_country, count(*) as agg__0 where agg__0 >= 1 return t1_country, t1_country\"\n                                  ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 34 (offset: 33))\n\"match (T1:ROOT__car_makers) with T1.car_makers__country as t1_country, T1.car_makers__country as t1_country, count(*) as agg__0 where agg__0 >= 1 return t1_country, t1_country\"\n                                  ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "sweden",
+          6
+        ],
+        [
+          "italy",
+          5
+        ],
+        [
+          "korea",
+          8
+        ],
+        [
+          "uk",
+          7
+        ],
+        [
+          "germany",
+          2
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "car_1",
+    "context": "(cypher) What is the largest amount of horsepower for the models with 3 cylinders and what make is it? | car_1 | ROOT__cars_data: uri, cars_data__cylinders, cars_data__weight, cars_data__edispl, cars_data__id, cars_data__year, cars_data__mpg, cars_data__accelerate, cars_data__horsepower, cars_data__ID | ROOT__continents: uri, continents__continent, continents__contid | ROOT__countries: uri, countries__continent, countries__countryid, countries__countryname, countries__CONTINENT | ROOT__car_makers: uri, car_makers__id, car_makers__fullname, car_makers__country, car_makers__maker, car_makers__COUNTRY | ROOT__car_names: uri, car_names__makeid, car_names__make, car_names__model, car_names__MODEL | ROOT__model_list: uri, model_list__model, model_list__modelid, model_list__maker, model_list__MAKER",
+    "pred_query_processed": "match (T1:ROOT__model_list) with max(T1.model_list__horsepower) as aggregation_t1_horsepower_177, min(T1.model_list__horsepower) as aggregation_t1_horsepower_177 return aggregation_t1_horsepower_177, aggregation_t1_horsepower_177",
+    "gold_query_processed": "match (t1:ROOT__cars_data)-[:cars_data__ID]->(t2:ROOT__car_names) where t1.cars_data__cylinders = 3 return t1.cars_data__horsepower as t1_horsepower, t2.car_names__make as t2_make order by t1.cars_data__horsepower desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__cars_data)-[:cars_data__ID]->(t2:ROOT__car_names) where t1.cars_data__cylinders = 3 return t1.cars_data__horsepower as t1_horsepower, t2.car_names__make as t2_make order by t1.cars_data__horsepower desc limit 1",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 34 (offset: 33))\n\"match (T1:ROOT__model_list) with max(T1.model_list__horsepower) as aggregation_t1_horsepower_177, min(T1.model_list__horsepower) as aggregation_t1_horsepower_177 return aggregation_t1_horsepower_177, aggregation_t1_horsepower_177\"\n                                  ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 34 (offset: 33))\n\"match (T1:ROOT__model_list) with max(T1.model_list__horsepower) as aggregation_t1_horsepower_177, min(T1.model_list__horsepower) as aggregation_t1_horsepower_177 return aggregation_t1_horsepower_177, aggregation_t1_horsepower_177\"\n                                  ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "97",
+          "mazda rx2 coupe"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "car_1",
+    "context": "(cypher) What is the maximum accelerate for all the different cylinders? | car_1 | ROOT__cars_data: uri, cars_data__cylinders, cars_data__weight, cars_data__edispl, cars_data__id, cars_data__year, cars_data__mpg, cars_data__accelerate, cars_data__horsepower, cars_data__ID | ROOT__continents: uri, continents__continent, continents__contid | ROOT__countries: uri, countries__continent, countries__countryid, countries__countryname, countries__CONTINENT | ROOT__car_makers: uri, car_makers__id, car_makers__fullname, car_makers__country, car_makers__maker, car_makers__COUNTRY | ROOT__car_names: uri, car_names__makeid, car_names__make, car_names__model, car_names__MODEL | ROOT__model_list: uri, model_list__model, model_list__modelid, model_list__maker, model_list__MAKER",
+    "pred_query_processed": "match (T1:ROOT__cars_data) with max(T1.cars_data__cylinders) as aggregation_t1_cylinders_138, min(T1.cars_data__cylinders) as aggregation_t1_cylinders_138, T1.cars_data__make as t1_make return aggregation_t1_cylinders_138, t1_make",
+    "gold_query_processed": "match (t1:ROOT__cars_data) with max(t1.cars_data__accelerate) as aggregation_t1_accelerate_42, t1.cars_data__cylinders as t1_cylinders return aggregation_t1_accelerate_42, t1_cylinders",
+    "gold_sql_processed": "match (t1:ROOT__cars_data) with max(t1.cars_data__accelerate) as aggregation_t1_accelerate_42, t1.cars_data__cylinders as t1_cylinders return aggregation_t1_accelerate_42, t1_cylinders",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 33 (offset: 32))\n\"match (T1:ROOT__cars_data) with max(T1.cars_data__cylinders) as aggregation_t1_cylinders_138, min(T1.cars_data__cylinders) as aggregation_t1_cylinders_138, T1.cars_data__make as t1_make return aggregation_t1_cylinders_138, t1_make\"\n                                 ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 33 (offset: 32))\n\"match (T1:ROOT__cars_data) with max(T1.cars_data__cylinders) as aggregation_t1_cylinders_138, min(T1.cars_data__cylinders) as aggregation_t1_cylinders_138, T1.cars_data__make as t1_make return aggregation_t1_cylinders_138, t1_make\"\n                                 ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          21.0,
+          6
+        ],
+        [
+          24.8,
+          4
+        ],
+        [
+          22.2,
+          8
+        ],
+        [
+          13.5,
+          3
+        ],
+        [
+          20.1,
+          5
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "cre_Doc_Template_Mgt",
+    "context": "(cypher) Show template ids, version numbers, and template type codes for all templates. | cre_Doc_Template_Mgt | ROOT__paragraphs: uri, paragraphs__document_id, paragraphs__paragraph_text, paragraphs__paragraph_id, paragraphs__DOCUMENT_ID | ROOT__ref_template_types: uri, ref_template_types__template_type_code, ref_template_types__template_type_description | ROOT__templates: uri, templates__date_effective_to, templates__version_number, templates__template_id, templates__template_details, templates__template_type_code, templates__date_effective_from, templates__TEMPLATE_TYPE_CODE | ROOT__documents: uri, documents__document_name, documents__document_description, documents__template_id, documents__document_id, documents__TEMPLATE_ID",
+    "pred_query_processed": "match (T1:ROOT__templates) return T1.templates__version_number as t1_version_number, T1.templates__version_number as t1_version_number, T1.templates__template_type_code as t1_template_type_code",
+    "gold_query_processed": "match (t1:ROOT__templates) return t1.templates__template_id as t1_template_id, t1.templates__version_number as t1_version_number, t1.templates__template_type_code as t1_template_type_code",
+    "gold_sql_processed": "match (t1:ROOT__templates) return t1.templates__template_id as t1_template_id, t1.templates__version_number as t1_version_number, t1.templates__template_type_code as t1_template_type_code",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 35 (offset: 34))\n\"match (T1:ROOT__templates) return T1.templates__version_number as t1_version_number, T1.templates__version_number as t1_version_number, T1.templates__template_type_code as t1_template_type_code\"\n                                   ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 35 (offset: 34))\n\"match (T1:ROOT__templates) return T1.templates__version_number as t1_version_number, T1.templates__version_number as t1_version_number, T1.templates__template_type_code as t1_template_type_code\"\n                                   ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          25,
+          5,
+          "PP"
+        ],
+        [
+          23,
+          2,
+          "BK"
+        ],
+        [
+          24,
+          8,
+          "PP"
+        ],
+        [
+          21,
+          9,
+          "AD"
+        ],
+        [
+          22,
+          0,
+          "PP"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "museum_visit",
+    "context": "(cypher) find the id, name and age for visitors who visited some museums more than once. | museum_visit | ROOT__visit: uri, visit__museum_id, visit__num_of_ticket, visit__total_spent, visit__visitor_id, visit__MUSEUM_ID, visit__VISITOR_ID | ROOT__museum: uri, museum__open_year, museum__name, museum__museum_id, museum__num_of_staff | ROOT__visitor: uri, visitor__level_of_membership, visitor__age, visitor__id, visitor__name",
+    "pred_query_processed": "match (T2:ROOT__visit)-[:visit__MUSEUM_ID]->(T1:ROOT__museum) with T1.museum__id as t1_id, T1.museum__name as t1_name, count(*) as agg__0 where agg__0 > 1 return t1_id, t1_name, t1_name, t1_name, t1_age",
+    "gold_query_processed": "match (t2:ROOT__visit)-[:visit__VISITOR_ID]->(t1:ROOT__visitor) with t1.visitor__id as t1_id, t1.visitor__name as t1_name, t1.visitor__age as t1_age, count(*) as agg__0 where agg__0 > 1 return t1_id, t1_name, t1_age",
+    "gold_sql_processed": "match (t2:ROOT__visit)-[:visit__VISITOR_ID]->(t1:ROOT__visitor) with t1.visitor__id as t1_id, t1.visitor__name as t1_name, t1.visitor__age as t1_age, count(*) as agg__0 where agg__0 > 1 return t1_id, t1_name, t1_age",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `t1_age` not defined (line 1, column 197 (offset: 196))\n\"match (T2:ROOT__visit)-[:visit__MUSEUM_ID]->(T1:ROOT__museum) with T1.museum__id as t1_id, T1.museum__name as t1_name, count(*) as agg__0 where agg__0 > 1 return t1_id, t1_name, t1_name, t1_name, t1_age\"\n                                                                                                                                                                                                     ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Variable `t1_age` not defined (line 1, column 197 (offset: 196))\n\"match (T2:ROOT__visit)-[:visit__MUSEUM_ID]->(T1:ROOT__museum) with T1.museum__id as t1_id, T1.museum__name as t1_name, count(*) as agg__0 where agg__0 > 1 return t1_id, t1_name, t1_name, t1_name, t1_age\"\n                                                                                                                                                                                                     ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          6,
+          "Rafael van der Vaart",
+          25
+        ],
+        [
+          5,
+          "Fernando Gago",
+          36
+        ],
+        [
+          3,
+          "Arjen Robben",
+          27
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "museum_visit",
+    "context": "(cypher) Find the name and age of the visitor who bought the most tickets at once. | museum_visit | ROOT__visit: uri, visit__museum_id, visit__num_of_ticket, visit__total_spent, visit__visitor_id, visit__MUSEUM_ID, visit__VISITOR_ID | ROOT__museum: uri, museum__open_year, museum__name, museum__museum_id, museum__num_of_staff | ROOT__visitor: uri, visitor__level_of_membership, visitor__age, visitor__id, visitor__name",
+    "pred_query_processed": "match (T2:ROOT__visit)-[:visit__MUSEUM_ID]->(T1:ROOT__visit) with T1.visit__name as t1_name, T1.visitor__age as t1_age order by T2.visit__num_of_ticket desc limit 1",
+    "gold_query_processed": "match (t2:ROOT__visit)-[:visit__VISITOR_ID]->(t1:ROOT__visitor) return t1.visitor__name as t1_name, t1.visitor__age as t1_age order by t2.visit__num_of_ticket desc limit 1",
+    "gold_sql_processed": "match (t2:ROOT__visit)-[:visit__VISITOR_ID]->(t1:ROOT__visitor) return t1.visitor__name as t1_name, t1.visitor__age as t1_age order by t2.visit__num_of_ticket desc limit 1",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Query cannot conclude with WITH (must be a RETURN clause, a FINISH clause, an update clause, a unit subquery call, or a procedure call with no YIELD). (line 1, column 62 (offset: 61))\n\"match (T2:ROOT__visit)-[:visit__MUSEUM_ID]->(T1:ROOT__visit) with T1.visit__name as t1_name, T1.visitor__age as t1_age order by T2.visit__num_of_ticket desc limit 1\"\n                                                              ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Query cannot conclude with WITH (must be a RETURN clause, a FINISH clause, an update clause, a unit subquery call, or a procedure call with no YIELD). (line 1, column 62 (offset: 61))\n\"match (T2:ROOT__visit)-[:visit__MUSEUM_ID]->(T1:ROOT__visit) with T1.visit__name as t1_name, T1.visitor__age as t1_age order by T2.visit__num_of_ticket desc limit 1\"\n                                                              ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Arjen Robben",
+          27
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "museum_visit",
+    "context": "(cypher) What are the average and maximum number of tickets bought in all visits? | museum_visit | ROOT__visit: uri, visit__museum_id, visit__num_of_ticket, visit__total_spent, visit__visitor_id, visit__MUSEUM_ID, visit__VISITOR_ID | ROOT__museum: uri, museum__open_year, museum__name, museum__museum_id, museum__num_of_staff | ROOT__visitor: uri, visitor__level_of_membership, visitor__age, visitor__id, visitor__name",
+    "pred_query_processed": "match (T1:ROOT__visit) with avg(T1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_107, max(T1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_107 return aggregation_t1_num_of_ticket_107, aggregation_t1_num_of_ticket_107",
+    "gold_query_processed": "match (t1:ROOT__visit) with avg(t1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_174, max(t1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_183 return aggregation_t1_num_of_ticket_174, aggregation_t1_num_of_ticket_183",
+    "gold_sql_processed": "match (t1:ROOT__visit) with avg(t1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_174, max(t1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_183 return aggregation_t1_num_of_ticket_174, aggregation_t1_num_of_ticket_183",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 29 (offset: 28))\n\"match (T1:ROOT__visit) with avg(T1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_107, max(T1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_107 return aggregation_t1_num_of_ticket_107, aggregation_t1_num_of_ticket_107\"\n                             ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 29 (offset: 28))\n\"match (T1:ROOT__visit) with avg(T1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_107, max(T1.visit__num_of_ticket) as aggregation_t1_num_of_ticket_107 return aggregation_t1_num_of_ticket_107, aggregation_t1_num_of_ticket_107\"\n                             ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          10.5,
+          24
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "battle_death",
+    "context": "(cypher) What is maximum and minimum death toll caused each time? | battle_death | ROOT__death: uri, death__note, death__caused_by_ship_id, death__id, death__killed, death__injured, death__CAUSED_BY_SHIP_ID | ROOT__battle: uri, battle__bulgarian_commander, battle__name, battle__date, battle__id, battle__result, battle__latin_commander | ROOT__ship: uri, ship__disposition_of_ship, ship__ship_type, ship__id, ship__tonnage, ship__location, ship__name, ship__lost_in_battle, ship__LOST_IN_BATTLE",
+    "pred_query_processed": "match (T1:ROOT__death) with max(T1.death__injured) as aggregation_t1_injured_19, min(T1.death__injured) as aggregation_t1_injured_19, min(T1.death__injured) as aggregation_t1_injured_19, T1.death__injured_19 return aggregation_t1_injured_19, aggregation_t1_injured_19, aggregation_t1_injured_19, aggregation_t1_injured_19",
+    "gold_query_processed": "match (t1:ROOT__death) with max(t1.death__killed) as aggregation_t1_killed_150, min(t1.death__killed) as aggregation_t1_killed_146 return aggregation_t1_killed_150, aggregation_t1_killed_146",
+    "gold_sql_processed": "match (t1:ROOT__death) with max(t1.death__killed) as aggregation_t1_killed_150, min(t1.death__killed) as aggregation_t1_killed_146 return aggregation_t1_killed_150, aggregation_t1_killed_146",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 29 (offset: 28))\n\"match (T1:ROOT__death) with max(T1.death__injured) as aggregation_t1_injured_19, min(T1.death__injured) as aggregation_t1_injured_19, min(T1.death__injured) as aggregation_t1_injured_19, T1.death__injured_19 return aggregation_t1_injured_19, aggregation_t1_injured_19, aggregation_t1_injured_19, aggregation_t1_injured_19\"\n                             ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 29 (offset: 28))\n\"match (T1:ROOT__death) with max(T1.death__injured) as aggregation_t1_injured_19, min(T1.death__injured) as aggregation_t1_injured_19, min(T1.death__injured) as aggregation_t1_injured_19, T1.death__injured_19 return aggregation_t1_injured_19, aggregation_t1_injured_19, aggregation_t1_injured_19, aggregation_t1_injured_19\"\n                             ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          29,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "student_transcripts_tracking",
+    "context": "(cypher) Who are enrolled in 2 degree programs in one semester? List the first name, middle name and last name and the id. | student_transcripts_tracking | ROOT__students: uri, students__date_first_registered, students__current_address_id, students__email_address, students__student_id, students__cell_mobile_number, students__last_name, students__first_name, students__permanent_address_id, students__middle_name, students__other_student_details, students__ssn, students__date_left, students__CURRENT_ADDRESS_ID, students__PERMANENT_ADDRESS_ID | ROOT__semesters: uri, semesters__semester_name, semesters__semester_id, semesters__semester_description | ROOT__student_enrolment: uri, student_enrolment__student_id, student_enrolment__degree_program_id, student_enrolment__semester_id, student_enrolment__student_enrolment_id, student_enrolment__DEGREE_PROGRAM_ID, student_enrolment__SEMESTER_ID, student_enrolment__STUDENT_ID | ROOT__sections: uri, sections__course_id, sections__section_name, sections__section_description, sections__section_id, sections__COURSE_ID | ROOT__addresses: uri, addresses__zip_postcode, addresses__line_2, addresses__country, addresses__address_id, addresses__city, addresses__state_province_county, addresses__line_",
+    "pred_query_processed": "match (T2:ROOT__student_enrolment)-[:student_enrolment__DEGREE_PROGRAM_ID]->(T1:ROOT__student_enrolment) with T1.student_enrolment__student_enrolment_id as t1_student_enrolment_id, T1.student_enrolment__student_id as t1_student_id, count(*) as agg__0 where agg__0 >= 2 return t1_student_enrolment_id, t1_student_id, t1_student_id",
+    "gold_query_processed": "match (t2:ROOT__student_enrolment)-[:student_enrolment__STUDENT_ID]->(t1:ROOT__students) match (t2:ROOT__student_enrolment)-[:student_enrolment__DEGREE_PROGRAM_ID]->(t3:ROOT__degree_programs) with t1.students__first_name as t1_first_name, t1.students__middle_name as t1_middle_name, t1.students__last_name as t1_last_name, t1.students__student_id as t1_student_id, count(*) as agg__0 where agg__0 = 2 return t1_first_name, t1_middle_name, t1_last_name, t1_student_id",
+    "gold_sql_processed": "match (t2:ROOT__student_enrolment)-[:student_enrolment__STUDENT_ID]->(t1:ROOT__students) match (t2:ROOT__student_enrolment)-[:student_enrolment__DEGREE_PROGRAM_ID]->(t3:ROOT__degree_programs) with t1.students__first_name as t1_first_name, t1.students__middle_name as t1_middle_name, t1.students__last_name as t1_last_name, t1.students__student_id as t1_student_id, count(*) as agg__0 where agg__0 = 2 return t1_first_name, t1_middle_name, t1_last_name, t1_student_id",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 302 (offset: 301))\n\"match (T2:ROOT__student_enrolment)-[:student_enrolment__DEGREE_PROGRAM_ID]->(T1:ROOT__student_enrolment) with T1.student_enrolment__student_enrolment_id as t1_student_enrolment_id, T1.student_enrolment__student_id as t1_student_id, count(*) as agg__0 where agg__0 >= 2 return t1_student_enrolment_id, t1_student_id, t1_student_id\"\n                                                                                                                                                                                                                                                                                                              ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 302 (offset: 301))\n\"match (T2:ROOT__student_enrolment)-[:student_enrolment__DEGREE_PROGRAM_ID]->(T1:ROOT__student_enrolment) with T1.student_enrolment__student_enrolment_id as t1_student_enrolment_id, T1.student_enrolment__student_id as t1_student_id, count(*) as agg__0 where agg__0 >= 2 return t1_student_enrolment_id, t1_student_id, t1_student_id\"\n                                                                                                                                                                                                                                                                                                              ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Jordy",
+          "Osborne",
+          "Rempel",
+          14
+        ],
+        [
+          "Reva",
+          "Golda",
+          "Osinski",
+          9
+        ],
+        [
+          "Jarvis",
+          "Aaliyah",
+          "Carroll",
+          4
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "student_transcripts_tracking",
+    "context": "(cypher) What are the first, middle, and last names, along with the ids, of all students who enrolled in 2 degree programs in one semester? | student_transcripts_tracking | ROOT__students: uri, students__date_first_registered, students__current_address_id, students__email_address, students__student_id, students__cell_mobile_number, students__last_name, students__first_name, students__permanent_address_id, students__middle_name, students__other_student_details, students__ssn, students__date_left, students__CURRENT_ADDRESS_ID, students__PERMANENT_ADDRESS_ID | ROOT__semesters: uri, semesters__semester_name, semesters__semester_id, semesters__semester_description | ROOT__student_enrolment: uri, student_enrolment__student_id, student_enrolment__degree_program_id, student_enrolment__semester_id, student_enrolment__student_enrolment_id, student_enrolment__DEGREE_PROGRAM_ID, student_enrolment__SEMESTER_ID, student_enrolment__STUDENT_ID | ROOT__sections: uri, sections__course_id, sections__section_name, sections__section_description, sections__section_id, sections__COURSE_ID | ROOT__addresses: uri, addresses__zip_postcode, addresses__line_2, addresses__country, addresses__address_id, addresses__city, addresses__state_province_county,",
+    "pred_query_processed": "match (T2:ROOT__student_enrolment)-[:student_enrolment__STUDENT_ID]->(T1:ROOT__students) with T1.students__first_name as t1_first_name, T1.students__middle_name as t1_middle_name, count(*) as agg__0 where agg__0 >= 2 return t1_first_name, t1_middle_name, t1_middle_name",
+    "gold_query_processed": "match (t2:ROOT__student_enrolment)-[:student_enrolment__STUDENT_ID]->(t1:ROOT__students) match (t2:ROOT__student_enrolment)-[:student_enrolment__DEGREE_PROGRAM_ID]->(t3:ROOT__degree_programs) with t1.students__first_name as t1_first_name, t1.students__middle_name as t1_middle_name, t1.students__last_name as t1_last_name, t1.students__student_id as t1_student_id, count(*) as agg__0 where agg__0 = 2 return t1_first_name, t1_middle_name, t1_last_name, t1_student_id",
+    "gold_sql_processed": "match (t2:ROOT__student_enrolment)-[:student_enrolment__STUDENT_ID]->(t1:ROOT__students) match (t2:ROOT__student_enrolment)-[:student_enrolment__DEGREE_PROGRAM_ID]->(t3:ROOT__degree_programs) with t1.students__first_name as t1_first_name, t1.students__middle_name as t1_middle_name, t1.students__last_name as t1_last_name, t1.students__student_id as t1_student_id, count(*) as agg__0 where agg__0 = 2 return t1_first_name, t1_middle_name, t1_last_name, t1_student_id",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 240 (offset: 239))\n\"match (T2:ROOT__student_enrolment)-[:student_enrolment__STUDENT_ID]->(T1:ROOT__students) with T1.students__first_name as t1_first_name, T1.students__middle_name as t1_middle_name, count(*) as agg__0 where agg__0 >= 2 return t1_first_name, t1_middle_name, t1_middle_name\"\n                                                                                                                                                                                                                                                ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 240 (offset: 239))\n\"match (T2:ROOT__student_enrolment)-[:student_enrolment__STUDENT_ID]->(T1:ROOT__students) with T1.students__first_name as t1_first_name, T1.students__middle_name as t1_middle_name, count(*) as agg__0 where agg__0 >= 2 return t1_first_name, t1_middle_name, t1_middle_name\"\n                                                                                                                                                                                                                                                ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Jordy",
+          "Osborne",
+          "Rempel",
+          14
+        ],
+        [
+          "Reva",
+          "Golda",
+          "Osinski",
+          9
+        ],
+        [
+          "Jarvis",
+          "Aaliyah",
+          "Carroll",
+          4
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "student_transcripts_tracking",
+    "context": "(cypher) What is the maximum number of times that a course shows up in different transcripts and what is that course's enrollment id? | student_transcripts_tracking | ROOT__students: uri, students__date_first_registered, students__current_address_id, students__email_address, students__student_id, students__cell_mobile_number, students__last_name, students__first_name, students__permanent_address_id, students__middle_name, students__other_student_details, students__ssn, students__date_left, students__CURRENT_ADDRESS_ID, students__PERMANENT_ADDRESS_ID | ROOT__semesters: uri, semesters__semester_name, semesters__semester_id, semesters__semester_description | ROOT__student_enrolment: uri, student_enrolment__student_id, student_enrolment__degree_program_id, student_enrolment__semester_id, student_enrolment__student_enrolment_id, student_enrolment__DEGREE_PROGRAM_ID, student_enrolment__SEMESTER_ID, student_enrolment__STUDENT_ID | ROOT__sections: uri, sections__course_id, sections__section_name, sections__section_description, sections__section_id, sections__COURSE_ID | ROOT__addresses: uri, addresses__zip_postcode, addresses__line_2, addresses__country, addresses__address_id, addresses__city, addresses__state_province_county, addresses__line",
+    "pred_query_processed": "match (T1:ROOT__student_enrolment) with max(T1.student_enrolment__semester_id) as aggregation_t1_semester_id_24, min(T1.student_enrolment__semester_id) as aggregation_t1_semester_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_i",
+    "gold_query_processed": "match (t1:ROOT__transcript_contents) with count(*) as aggregation_all, t1.transcript_contents__student_course_id as t1_student_course_id return aggregation_all, t1_student_course_id order by aggregation_all desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__transcript_contents) with count(*) as aggregation_all, t1.transcript_contents__student_course_id as t1_student_course_id return aggregation_all, t1_student_course_id order by aggregation_all desc limit 1",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Query cannot conclude with WITH (must be a RETURN clause, a FINISH clause, an update clause, a unit subquery call, or a procedure call with no YIELD). (line 1, column 36 (offset: 35))\n\"match (T1:ROOT__student_enrolment) with max(T1.student_enrolment__semester_id) as aggregation_t1_semester_id_24, min(T1.student_enrolment__semester_id) as aggregation_t1_semester_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_i\"\n                                    ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Query cannot conclude with WITH (must be a RETURN clause, a FINISH clause, an update clause, a unit subquery call, or a procedure call with no YIELD). (line 1, column 36 (offset: 35))\n\"match (T1:ROOT__student_enrolment) with max(T1.student_enrolment__semester_id) as aggregation_t1_semester_id_24, min(T1.student_enrolment__semester_id) as aggregation_t1_semester_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_id_i\"\n                                    ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          4,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) Which country has the most of TV Channels? List the country and number of TV Channels it has. | tvshow | ROOT__tv_series: uri, tv_series__channel, tv_series__id, tv_series__episode, tv_series__share, tv_series__viewers_m, tv_series__rating, tv_series__weekly_rank, tv_series__air_date, tv_series__rating_share, tv_series__CHANNEL | ROOT__cartoon: uri, cartoon__title, cartoon__original_air_date, cartoon__written_by, cartoon__directed_by, cartoon__id, cartoon__production_code, cartoon__channel, cartoon__CHANNEL | ROOT__tv_channel: uri, tv_channel__country, tv_channel__language, tv_channel__package_option, tv_channel__pay_per_view_ppv, tv_channel__content, tv_channel__series_name, tv_channel__high_definition_tv, tv_channel__pixel_aspect_ratio_par, tv_channel__id",
+    "pred_query_processed": "match (T1:ROOT__tv_channel) return T1.tv_channel__country as t1_country, T1.tv_channel__country as t1_country order by T1.tv_channel__rating_share desc limit 1",
+    "gold_query_processed": "match (t1:ROOT__tv_channel) with count(*) as aggregation_all, t1.tv_channel__country as t1_country return t1_country, aggregation_all order by aggregation_all desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__tv_channel) with count(*) as aggregation_all, t1.tv_channel__country as t1_country return t1_country, aggregation_all order by aggregation_all desc limit 1",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 36 (offset: 35))\n\"match (T1:ROOT__tv_channel) return T1.tv_channel__country as t1_country, T1.tv_channel__country as t1_country order by T1.tv_channel__rating_share desc limit 1\"\n                                    ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 36 (offset: 35))\n\"match (T1:ROOT__tv_channel) return T1.tv_channel__country as t1_country, T1.tv_channel__country as t1_country order by T1.tv_channel__rating_share desc limit 1\"\n                                    ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Italy",
+          12
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) List the number of different series names and contents in the TV Channel table. | tvshow | ROOT__tv_series: uri, tv_series__channel, tv_series__id, tv_series__episode, tv_series__share, tv_series__viewers_m, tv_series__rating, tv_series__weekly_rank, tv_series__air_date, tv_series__rating_share, tv_series__CHANNEL | ROOT__cartoon: uri, cartoon__title, cartoon__original_air_date, cartoon__written_by, cartoon__directed_by, cartoon__id, cartoon__production_code, cartoon__channel, cartoon__CHANNEL | ROOT__tv_channel: uri, tv_channel__country, tv_channel__language, tv_channel__package_option, tv_channel__pay_per_view_ppv, tv_channel__content, tv_channel__series_name, tv_channel__high_definition_tv, tv_channel__pixel_aspect_ratio_par, tv_channel__id",
+    "pred_query_processed": "match (T1:ROOT__tv_series) where T1.tv_series__name = 'TV Channel' with count(  T1.tv_series__series_name) as aggregation_t1_series_name_116, T1.tv_series__series__id as t1_id return   t1_series_name, aggregation_t1_series__id, aggregation_t1_id",
+    "gold_query_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "gold_sql_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `t1_series_name` not defined (line 1, column 186 (offset: 185))\n\"match (T1:ROOT__tv_series) where T1.tv_series__name = 'TV Channel' with count(  T1.tv_series__series_name) as aggregation_t1_series_name_116, T1.tv_series__series__id as t1_id return   t1_series_name, aggregation_t1_series__id, aggregation_t1_id\"\n                                                                                                                                                                                          ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Variable `t1_series_name` not defined (line 1, column 186 (offset: 185))\n\"match (T1:ROOT__tv_series) where T1.tv_series__name = 'TV Channel' with count(  T1.tv_series__series_name) as aggregation_t1_series_name_116, T1.tv_series__series__id as t1_id return   t1_series_name, aggregation_t1_series__id, aggregation_t1_id\"\n                                                                                                                                                                                          ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          15,
+          15
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) How many different series and contents are listed in the TV Channel table? | tvshow | ROOT__tv_series: uri, tv_series__channel, tv_series__id, tv_series__episode, tv_series__share, tv_series__viewers_m, tv_series__rating, tv_series__weekly_rank, tv_series__air_date, tv_series__rating_share, tv_series__CHANNEL | ROOT__cartoon: uri, cartoon__title, cartoon__original_air_date, cartoon__written_by, cartoon__directed_by, cartoon__id, cartoon__production_code, cartoon__channel, cartoon__CHANNEL | ROOT__tv_channel: uri, tv_channel__country, tv_channel__language, tv_channel__package_option, tv_channel__pay_per_view_ppv, tv_channel__content, tv_channel__series_name, tv_channel__high_definition_tv, tv_channel__pixel_aspect_ratio_par, tv_channel__id",
+    "pred_query_processed": "match (T1:ROOT__tv_series)-[:tv_series__CHANNEL]->(T2:ROOT__tv_channel) where T2.tv_channel__language = 'TV Channel' with count(  T1.tv_series__series_name) as aggregation_t1_series_name_116, T2.tv_channel__ref_publish_by as t2_ref_publish_by return   aggregation_t1_series__series_116, t2_ref_publish_by",
+    "gold_query_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "gold_sql_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `aggregation_t1_series__series_116` not defined (line 1, column 253 (offset: 252))\n\"match (T1:ROOT__tv_series)-[:tv_series__CHANNEL]->(T2:ROOT__tv_channel) where T2.tv_channel__language = 'TV Channel' with count(  T1.tv_series__series_name) as aggregation_t1_series_name_116, T2.tv_channel__ref_publish_by as t2_ref_publish_by return   aggregation_t1_series__series_116, t2_ref_publish_by\"\n                                                                                                                                                                                                                                                             ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Variable `aggregation_t1_series__series_116` not defined (line 1, column 253 (offset: 252))\n\"match (T1:ROOT__tv_series)-[:tv_series__CHANNEL]->(T2:ROOT__tv_channel) where T2.tv_channel__language = 'TV Channel' with count(  T1.tv_series__series_name) as aggregation_t1_series_name_116, T2.tv_channel__ref_publish_by as t2_ref_publish_by return   aggregation_t1_series__series_116, t2_ref_publish_by\"\n                                                                                                                                                                                                                                                             ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          15,
+          15
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) List the language used least number of TV Channel. List language and number of TV Channel. | tvshow | ROOT__tv_series: uri, tv_series__channel, tv_series__id, tv_series__episode, tv_series__share, tv_series__viewers_m, tv_series__rating, tv_series__weekly_rank, tv_series__air_date, tv_series__rating_share, tv_series__CHANNEL | ROOT__cartoon: uri, cartoon__title, cartoon__original_air_date, cartoon__written_by, cartoon__directed_by, cartoon__id, cartoon__production_code, cartoon__channel, cartoon__CHANNEL | ROOT__tv_channel: uri, tv_channel__country, tv_channel__language, tv_channel__package_option, tv_channel__pay_per_view_ppv, tv_channel__content, tv_channel__series_name, tv_channel__high_definition_tv, tv_channel__pixel_aspect_ratio_par, tv_channel__id",
+    "pred_query_processed": "match (T1:ROOT__tv_channel) return T1.tv_channel__language as t1_language, T1.tv_channel__language as t1_language order by T1.tv_channel__rating_share asc limit 1",
+    "gold_query_processed": "match (t1:ROOT__tv_channel) with count(*) as aggregation_all, t1.tv_channel__language as t1_language return t1_language, aggregation_all order by aggregation_all asc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__tv_channel) with count(*) as aggregation_all, t1.tv_channel__language as t1_language return t1_language, aggregation_all order by aggregation_all asc limit 1",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 36 (offset: 35))\n\"match (T1:ROOT__tv_channel) return T1.tv_channel__language as t1_language, T1.tv_channel__language as t1_language order by T1.tv_channel__rating_share asc limit 1\"\n                                    ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 36 (offset: 35))\n\"match (T1:ROOT__tv_channel) return T1.tv_channel__language as t1_language, T1.tv_channel__language as t1_language order by T1.tv_channel__rating_share asc limit 1\"\n                                    ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "English",
+          3
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) What is the maximum and minimum share for the TV series? | tvshow | ROOT__tv_series: uri, tv_series__channel, tv_series__id, tv_series__episode, tv_series__share, tv_series__viewers_m, tv_series__rating, tv_series__weekly_rank, tv_series__air_date, tv_series__rating_share, tv_series__CHANNEL | ROOT__cartoon: uri, cartoon__title, cartoon__original_air_date, cartoon__written_by, cartoon__directed_by, cartoon__id, cartoon__production_code, cartoon__channel, cartoon__CHANNEL | ROOT__tv_channel: uri, tv_channel__country, tv_channel__language, tv_channel__package_option, tv_channel__pay_per_view_ppv, tv_channel__content, tv_channel__series_name, tv_channel__high_definition_tv, tv_channel__pixel_aspect_ratio_par, tv_channel__id",
+    "pred_query_processed": "match (T1:ROOT__tv_series) with max(T1.tv_series__rating_share) as aggregation_t1_rating_share_107, min(T1.tv_series__rating_share) as aggregation_t1_rating_share_107 return aggregation_t1_rating_share_107, aggregation_t1_rating_share_107",
+    "gold_query_processed": "match (t1:ROOT__tv_series) with max(t1.tv_series__share) as aggregation_t1_share_61, min(t1.tv_series__share) as aggregation_t1_share_112 return aggregation_t1_share_61, aggregation_t1_share_112",
+    "gold_sql_processed": "match (t1:ROOT__tv_series) with max(t1.tv_series__share) as aggregation_t1_share_61, min(t1.tv_series__share) as aggregation_t1_share_112 return aggregation_t1_share_61, aggregation_t1_share_112",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 33 (offset: 32))\n\"match (T1:ROOT__tv_series) with max(T1.tv_series__rating_share) as aggregation_t1_rating_share_107, min(T1.tv_series__rating_share) as aggregation_t1_rating_share_107 return aggregation_t1_rating_share_107, aggregation_t1_rating_share_107\"\n                                 ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 33 (offset: 32))\n\"match (T1:ROOT__tv_series) with max(T1.tv_series__rating_share) as aggregation_t1_rating_share_107, min(T1.tv_series__rating_share) as aggregation_t1_rating_share_107 return aggregation_t1_rating_share_107, aggregation_t1_rating_share_107\"\n                                 ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          9.0,
+          5.0
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) What is the produdction code and channel of the most recent cartoon? | tvshow | ROOT__tv_series: uri, tv_series__channel, tv_series__id, tv_series__episode, tv_series__share, tv_series__viewers_m, tv_series__rating, tv_series__weekly_rank, tv_series__air_date, tv_series__rating_share, tv_series__CHANNEL | ROOT__cartoon: uri, cartoon__title, cartoon__original_air_date, cartoon__written_by, cartoon__directed_by, cartoon__id, cartoon__production_code, cartoon__channel, cartoon__CHANNEL | ROOT__tv_channel: uri, tv_channel__country, tv_channel__language, tv_channel__package_option, tv_channel__pay_per_view_ppv, tv_channel__content, tv_channel__series_name, tv_channel__high_definition_tv, tv_channel__pixel_aspect_ratio_par, tv_channel__id",
+    "pred_query_processed": "match (T1:ROOT__cartoon) return T1.cartoon__ produdction_code as t1_ produdction_code, T1.cartoon__channel as t1_channel order by T1.cartoon__date desc limit 1",
+    "gold_query_processed": "match (T1:ROOT__cartoon) return T1.cartoon__production_code as t1_production_code, T1.cartoon__channel as t1_channel order by T1.cartoon__original_air_date desc limit 1",
+    "gold_sql_processed": "match (T1:ROOT__cartoon) return T1.cartoon__production_code as t1_production_code, T1.cartoon__channel as t1_channel order by T1.cartoon__original_air_date desc limit 1",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'produdction_code': expected\n  \"!=\"\n  \"%\"\n  \"*\"\n  \"+\"\n  \",\"\n  \"-\"\n  \"/\"\n  \"::\"\n  \"<\"\n  \"<=\"\n  \"<>\"\n  \"=\"\n  \"=~\"\n  \">\"\n  \">=\"\n  \"AND\"\n  \"AS\"\n  \"CALL\"\n  \"CONTAINS\"\n  \"CREATE\"\n  \"DELETE\"\n  \"DETACH\"\n  \"ENDS\"\n  \"FINISH\"\n  \"FOREACH\"\n  \"IN\"\n  \"INSERT\"\n  \"IS\"\n  \"LIMIT\"\n  \"LOAD\"\n  \"MATCH\"\n  \"MERGE\"\n  \"NODETACH\"\n  \"OPTIONAL\"\n  \"OR\"\n  \"ORDER\"\n  \"REMOVE\"\n  \"RETURN\"\n  \"SET\"\n  \"SKIP\"\n  \"STARTS\"\n  \"UNION\"\n  \"UNWIND\"\n  \"USE\"\n  \"WITH\"\n  \"XOR\"\n  \"^\"\n  \"||\"\n  <EOF> (line 1, column 46 (offset: 45))\n\"match (T1:ROOT__cartoon) return T1.cartoon__ produdction_code as t1_ produdction_code, T1.cartoon__channel as t1_channel order by T1.cartoon__date desc limit 1\"\n                                              ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Invalid input 'produdction_code': expected\n  \"!=\"\n  \"%\"\n  \"*\"\n  \"+\"\n  \",\"\n  \"-\"\n  \"/\"\n  \"::\"\n  \"<\"\n  \"<=\"\n  \"<>\"\n  \"=\"\n  \"=~\"\n  \">\"\n  \">=\"\n  \"AND\"\n  \"AS\"\n  \"CALL\"\n  \"CONTAINS\"\n  \"CREATE\"\n  \"DELETE\"\n  \"DETACH\"\n  \"ENDS\"\n  \"FINISH\"\n  \"FOREACH\"\n  \"IN\"\n  \"INSERT\"\n  \"IS\"\n  \"LIMIT\"\n  \"LOAD\"\n  \"MATCH\"\n  \"MERGE\"\n  \"NODETACH\"\n  \"OPTIONAL\"\n  \"OR\"\n  \"ORDER\"\n  \"REMOVE\"\n  \"RETURN\"\n  \"SET\"\n  \"SKIP\"\n  \"STARTS\"\n  \"UNION\"\n  \"UNWIND\"\n  \"USE\"\n  \"WITH\"\n  \"XOR\"\n  \"^\"\n  \"||\"\n  <EOF> (line 1, column 46 (offset: 45))\n\"match (T1:ROOT__cartoon) return T1.cartoon__ produdction_code as t1_ produdction_code, T1.cartoon__channel as t1_channel order by T1.cartoon__date desc limit 1\"\n                                              ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          102.0,
+          "701"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) What is the series name and country of all TV channels that are playing cartoons directed by Ben Jones and cartoons directed by Michael Chang? | tvshow | ROOT__tv_series: uri, tv_series__channel, tv_series__id, tv_series__episode, tv_series__share, tv_series__viewers_m, tv_series__rating, tv_series__weekly_rank, tv_series__air_date, tv_series__rating_share, tv_series__CHANNEL | ROOT__cartoon: uri, cartoon__title, cartoon__original_air_date, cartoon__written_by, cartoon__directed_by, cartoon__id, cartoon__production_code, cartoon__channel, cartoon__CHANNEL | ROOT__tv_channel: uri, tv_channel__country, tv_channel__language, tv_channel__package_option, tv_channel__pay_per_view_ppv, tv_channel__content, tv_channel__series_name, tv_channel__high_definition_tv, tv_channel__pixel_aspect_ratio_par, tv_channel__id",
+    "pred_query_processed": "match (T1:ROOT__tv_series)-[:tv_series__CHANNEL]->(T2:ROOT__tv_channel) match (Tv_channel)-[:tv_channel__CHANNEL]->(T3:ROOT__tv_channel) where T2.tv_channel__directed_by = 'David Chang' AND T3.tv_channel__country IN [T3.tv_channel__country] AND T4.tv_channel__directed_by = 'Michael Chang' return   T1.tv_series__series_name as t1_series_name, T1.tv_channel__country as t1_country",
+    "gold_query_processed": "match (t2:ROOT__cartoon)-[:cartoon__CHANNEL]->(t1:ROOT__tv_channel) match (t4:ROOT__cartoon)-[:cartoon__CHANNEL]->(t3:ROOT__tv_channel) where t2.cartoon__directed_by = 'Michael Chang' AND t1.tv_channel__series_name IN [t3.tv_channel__series_name] AND t1.tv_channel__country IN [t3.tv_channel__country] AND t4.cartoon__directed_by = 'Ben Jones' return   t1.tv_channel__series_name as t1_series_name, t1.tv_channel__country as t1_country",
+    "gold_sql_processed": "match (t2:ROOT__cartoon)-[:cartoon__CHANNEL]->(t1:ROOT__tv_channel) match (t4:ROOT__cartoon)-[:cartoon__CHANNEL]->(t3:ROOT__tv_channel) where t2.cartoon__directed_by = 'Michael Chang' AND t1.tv_channel__series_name IN [t3.tv_channel__series_name] AND t1.tv_channel__country IN [t3.tv_channel__country] AND t4.cartoon__directed_by = 'Ben Jones' return   t1.tv_channel__series_name as t1_series_name, t1.tv_channel__country as t1_country",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `T4` not defined (line 1, column 246 (offset: 245))\n\"match (T1:ROOT__tv_series)-[:tv_series__CHANNEL]->(T2:ROOT__tv_channel) match (Tv_channel)-[:tv_channel__CHANNEL]->(T3:ROOT__tv_channel) where T2.tv_channel__directed_by = 'David Chang' AND T3.tv_channel__country IN [T3.tv_channel__country] AND T4.tv_channel__directed_by = 'Michael Chang' return   T1.tv_series__series_name as t1_series_name, T1.tv_channel__country as t1_country\"\n                                                                                                                                                                                                                                                      ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Variable `T4` not defined (line 1, column 246 (offset: 245))\n\"match (T1:ROOT__tv_series)-[:tv_series__CHANNEL]->(T2:ROOT__tv_channel) match (Tv_channel)-[:tv_channel__CHANNEL]->(T3:ROOT__tv_channel) where T2.tv_channel__directed_by = 'David Chang' AND T3.tv_channel__country IN [T3.tv_channel__country] AND T4.tv_channel__directed_by = 'Michael Chang' return   T1.tv_series__series_name as t1_series_name, T1.tv_channel__country as t1_country\"\n                                                                                                                                                                                                                                                      ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "MTV Dance",
+          "United Kingdom"
+        ],
+        [
+          "MTV Dance",
+          "United Kingdom"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "world_1",
+    "context": "(cypher) What region does Angola belong to and what is its population? | world_1 | ROOT__country: uri, country__indepyear, country__continent, country__surfacearea, country__lifeexpectancy, country__name, country__capital, country__governmentform, country__headofstate, country__gnpold, country__code2, country__localname, country__population, country__code, country__gnp, country__region | ROOT__countrylanguage: uri, countrylanguage__countrycode, countrylanguage__percentage, countrylanguage__language, countrylanguage__isofficial, countrylanguage__COUNTRYCODE | ROOT__city: uri, city__population, city__name, city__id, city__district, city__countrycode, city__COUNTRYCODE",
+    "pred_query_processed": "match (T1:ROOT__country) where T1.country__population = 'Angola' return T1.country__region as t1_region, T1.country__region as t1_region",
+    "gold_query_processed": "match (t1:ROOT__country) where t1.country__name = 'Angola' return t1.country__population as t1_population, t1.country__region as t1_region",
+    "gold_sql_processed": "match (t1:ROOT__country) where t1.country__name = 'Angola' return t1.country__population as t1_population, t1.country__region as t1_region",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 73 (offset: 72))\n\"match (T1:ROOT__country) where T1.country__population = 'Angola' return T1.country__region as t1_region, T1.country__region as t1_region\"\n                                                                         ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 73 (offset: 72))\n\"match (T1:ROOT__country) where T1.country__population = 'Angola' return T1.country__region as t1_region, T1.country__region as t1_region\"\n                                                                         ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          12878000,
+          "Central Africa"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "orchestra",
+    "context": "(cypher) What are the maximum and minimum share of performances whose type is not 'Live final'. | orchestra | ROOT__orchestra: uri, orchestra__year_of_founded, orchestra__orchestra, orchestra__orchestra_id, orchestra__record_company, orchestra__major_record_format, orchestra__CONDUCTOR_ID | ROOT__show: uri, show__result, show__show_id, show__attendance, show__if_first_show, show__PERFORMANCE_ID | ROOT__conductor: uri, conductor__year_of_work, conductor__conductor_id, conductor__age, conductor__nationality, conductor__name | ROOT__performance: uri, performance__weekly_rank, performance__share, performance__date, performance__official_ratings_(millions), performance__type, performance__performance_id, performance__ORCHESTRA_ID",
+    "pred_query_processed": "match (T1:ROOT__performance) where T1.performance__type <> 'Live final' with max(T1.performance__share) as aggregation_t1_share_107, min(T1.performance__share) as aggregation_t1_share_107 return aggregation_t1_share_107, aggregation_t1_share_107",
+    "gold_query_processed": "match (t1:ROOT__performance) where t1.performance__type <> 'Live final' with max(t1.performance__share) as aggregation_t1_share_107, min(t1.performance__share) as aggregation_t1_share_137 return aggregation_t1_share_107, aggregation_t1_share_137",
+    "gold_sql_processed": "match (t1:ROOT__performance) where t1.performance__type <> 'Live final' with max(t1.performance__share) as aggregation_t1_share_107, min(t1.performance__share) as aggregation_t1_share_137 return aggregation_t1_share_107, aggregation_t1_share_137",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 78 (offset: 77))\n\"match (T1:ROOT__performance) where T1.performance__type <> 'Live final' with max(T1.performance__share) as aggregation_t1_share_107, min(T1.performance__share) as aggregation_t1_share_107 return aggregation_t1_share_107, aggregation_t1_share_107\"\n                                                                              ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 78 (offset: 77))\n\"match (T1:ROOT__performance) where T1.performance__type <> 'Live final' with max(T1.performance__share) as aggregation_t1_share_107, min(T1.performance__share) as aggregation_t1_share_107 return aggregation_t1_share_107, aggregation_t1_share_107\"\n                                                                              ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "44.7%",
+          "22.7%"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "orchestra",
+    "context": "(cypher) Return the maximum and minimum shares for performances that do not have the type 'Live final'. | orchestra | ROOT__orchestra: uri, orchestra__year_of_founded, orchestra__orchestra, orchestra__orchestra_id, orchestra__record_company, orchestra__major_record_format, orchestra__CONDUCTOR_ID | ROOT__show: uri, show__result, show__show_id, show__attendance, show__if_first_show, show__PERFORMANCE_ID | ROOT__conductor: uri, conductor__year_of_work, conductor__conductor_id, conductor__age, conductor__nationality, conductor__name | ROOT__performance: uri, performance__weekly_rank, performance__share, performance__date, performance__official_ratings_(millions), performance__type, performance__performance_id, performance__ORCHESTRA_ID",
+    "pred_query_processed": "match (T1:ROOT__performance) where T1.performance__type <> 'Live final' with max(T1.performance__share) as aggregation_t1_share_107, min(T1.performance__share) as aggregation_t1_share_107 return aggregation_t1_share_107, aggregation_t1_share_107",
+    "gold_query_processed": "match (t1:ROOT__performance) where t1.performance__type <> 'Live final' with max(t1.performance__share) as aggregation_t1_share_107, min(t1.performance__share) as aggregation_t1_share_137 return aggregation_t1_share_107, aggregation_t1_share_137",
+    "gold_sql_processed": "match (t1:ROOT__performance) where t1.performance__type <> 'Live final' with max(t1.performance__share) as aggregation_t1_share_107, min(t1.performance__share) as aggregation_t1_share_137 return aggregation_t1_share_107, aggregation_t1_share_137",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 78 (offset: 77))\n\"match (T1:ROOT__performance) where T1.performance__type <> 'Live final' with max(T1.performance__share) as aggregation_t1_share_107, min(T1.performance__share) as aggregation_t1_share_107 return aggregation_t1_share_107, aggregation_t1_share_107\"\n                                                                              ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 78 (offset: 77))\n\"match (T1:ROOT__performance) where T1.performance__type <> 'Live final' with max(T1.performance__share) as aggregation_t1_share_107, min(T1.performance__share) as aggregation_t1_share_107 return aggregation_t1_share_107, aggregation_t1_share_107\"\n                                                                              ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "44.7%",
+          "22.7%"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "dog_kennels",
+    "context": "(cypher) How much does each charge type costs? List both charge type and amount. | dog_kennels | ROOT__dogs: uri, dogs__name, dogs__weight, dogs__date_arrived, dogs__date_adopted, dogs__date_departed, dogs__abandoned_yn, dogs__breed_code, dogs__size_code, dogs__date_of_birth, dogs__age, dogs__gender, dogs__DOG_ID, dogs__OWNER_ID | ROOT__sizes: uri, sizes__size_code, sizes__size_description | ROOT__treatments: uri, treatments__treatment_type_code, treatments__cost_of_treatment, treatments__date_of_treatment, treatments__DOG_ID, treatments__PROFESSIONAL_ID, treatments__TREATMENT_ID | ROOT__charges: uri, charges__charge_amount, charges__charge_type, charges__CHARGE_ID | ROOT__treatment_types: uri, treatment_types__treatment_type_description, treatment_types__treatment_type_code | ROOT__owners: uri, owners__cell_number, owners__zip_code, owners__email_address, owners__last_name, owners__home_phone, owners__state, owners__first_name, owners__city, owners__street, owners__OWNER_ID | ROOT__professionals: uri, professionals__last_name, professionals__email_address, professionals__zip_code, professionals__city, professionals__cell_number, professionals__state, professionals__home_phone, professionals__street, professionals__role_code, professionals__first_name, professionals__PROFESSIONAL_ID | ROOT_",
+    "pred_query_processed": "match (T1:ROOT__charges) with sum(T1.charges__charge_type) as aggregation_t1_charge_type_136, T1.charges__charge_type as t1_charge_type return t1_charge_type, aggregation_t1_charge_type",
+    "gold_query_processed": "match (t1:ROOT__charges) return t1.charges__charge_type as t1_charge_type, t1.charges__charge_amount as t1_charge_amount",
+    "gold_sql_processed": "match (t1:ROOT__charges) return t1.charges__charge_type as t1_charge_type, t1.charges__charge_amount as t1_charge_amount",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `aggregation_t1_charge_type` not defined (line 1, column 160 (offset: 159))\n\"match (T1:ROOT__charges) with sum(T1.charges__charge_type) as aggregation_t1_charge_type_136, T1.charges__charge_type as t1_charge_type return t1_charge_type, aggregation_t1_charge_type\"\n                                                                                                                                                                ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Variable `aggregation_t1_charge_type` not defined (line 1, column 160 (offset: 159))\n\"match (T1:ROOT__charges) with sum(T1.charges__charge_type) as aggregation_t1_charge_type_136, T1.charges__charge_type as t1_charge_type return t1_charge_type, aggregation_t1_charge_type\"\n                                                                                                                                                                ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Drugs",
+          322
+        ],
+        [
+          "Health Check",
+          640
+        ],
+        [
+          "Daily Accommodation",
+          98
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "dog_kennels",
+    "context": "(cypher) List each charge type and its amount. | dog_kennels | ROOT__dogs: uri, dogs__name, dogs__weight, dogs__date_arrived, dogs__date_adopted, dogs__date_departed, dogs__abandoned_yn, dogs__breed_code, dogs__size_code, dogs__date_of_birth, dogs__age, dogs__gender, dogs__DOG_ID, dogs__OWNER_ID | ROOT__sizes: uri, sizes__size_code, sizes__size_description | ROOT__treatments: uri, treatments__treatment_type_code, treatments__cost_of_treatment, treatments__date_of_treatment, treatments__DOG_ID, treatments__PROFESSIONAL_ID, treatments__TREATMENT_ID | ROOT__charges: uri, charges__charge_amount, charges__charge_type, charges__CHARGE_ID | ROOT__treatment_types: uri, treatment_types__treatment_type_description, treatment_types__treatment_type_code | ROOT__owners: uri, owners__cell_number, owners__zip_code, owners__email_address, owners__last_name, owners__home_phone, owners__state, owners__first_name, owners__city, owners__street, owners__OWNER_ID | ROOT__professionals: uri, professionals__last_name, professionals__email_address, professionals__zip_code, professionals__city, professionals__cell_number, professionals__state, professionals__home_phone, professionals__street, professionals__role_code, professionals__first_name, professionals__PROFESSIONAL_ID | ROOT__breeds: ",
+    "pred_query_processed": "match (T1:ROOT__charges) return T1.charges__charge_type as t1_charge_type, T1.charges__charge_type as t1_charge_type",
+    "gold_query_processed": "match (t1:ROOT__charges) return t1.charges__charge_type as t1_charge_type, t1.charges__charge_amount as t1_charge_amount",
+    "gold_sql_processed": "match (t1:ROOT__charges) return t1.charges__charge_type as t1_charge_type, t1.charges__charge_amount as t1_charge_amount",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 33 (offset: 32))\n\"match (T1:ROOT__charges) return T1.charges__charge_type as t1_charge_type, T1.charges__charge_type as t1_charge_type\"\n                                 ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 33 (offset: 32))\n\"match (T1:ROOT__charges) return T1.charges__charge_type as t1_charge_type, T1.charges__charge_type as t1_charge_type\"\n                                 ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Drugs",
+          322
+        ],
+        [
+          "Health Check",
+          640
+        ],
+        [
+          "Daily Accommodation",
+          98
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "dog_kennels",
+    "context": "(cypher) What are the email, cell phone and home phone of each professional? | dog_kennels | ROOT__dogs: uri, dogs__name, dogs__weight, dogs__date_arrived, dogs__date_adopted, dogs__date_departed, dogs__abandoned_yn, dogs__breed_code, dogs__size_code, dogs__date_of_birth, dogs__age, dogs__gender, dogs__DOG_ID, dogs__OWNER_ID | ROOT__sizes: uri, sizes__size_code, sizes__size_description | ROOT__treatments: uri, treatments__treatment_type_code, treatments__cost_of_treatment, treatments__date_of_treatment, treatments__DOG_ID, treatments__PROFESSIONAL_ID, treatments__TREATMENT_ID | ROOT__charges: uri, charges__charge_amount, charges__charge_type, charges__CHARGE_ID | ROOT__treatment_types: uri, treatment_types__treatment_type_description, treatment_types__treatment_type_code | ROOT__owners: uri, owners__cell_number, owners__zip_code, owners__email_address, owners__last_name, owners__home_phone, owners__state, owners__first_name, owners__city, owners__street, owners__OWNER_ID | ROOT__professionals: uri, professionals__last_name, professionals__email_address, professionals__zip_code, professionals__city, professionals__cell_number, professionals__state, professionals__home_phone, professionals__street, professionals__role_code, professionals__first_name, professionals__PROFESSIONAL_ID | ROOT__",
+    "pred_query_processed": "match (T1:ROOT__professionals) return T1.professionals__email_address as t1_email_address, T1.professionals__home_phone as t1_home_phone, T1.professionals__home_phone as t1_home_phone",
+    "gold_query_processed": "match (t1:ROOT__professionals) return t1.professionals__email_address as t1_email_address, t1.professionals__cell_number as t1_cell_number, t1.professionals__home_phone as t1_home_phone",
+    "gold_sql_processed": "match (t1:ROOT__professionals) return t1.professionals__email_address as t1_email_address, t1.professionals__cell_number as t1_cell_number, t1.professionals__home_phone as t1_home_phone",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Multiple result columns with the same name are not supported (line 1, column 92 (offset: 91))\n\"match (T1:ROOT__professionals) return T1.professionals__email_address as t1_email_address, T1.professionals__home_phone as t1_home_phone, T1.professionals__home_phone as t1_home_phone\"\n                                                                                            ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Multiple result columns with the same name are not supported (line 1, column 92 (offset: 91))\n\"match (T1:ROOT__professionals) return T1.professionals__email_address as t1_email_address, T1.professionals__home_phone as t1_home_phone, T1.professionals__home_phone as t1_home_phone\"\n                                                                                            ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "deanna.schuster@example.com",
+          "(275)939-2435x80863",
+          "+71(6)2898266914"
+        ],
+        [
+          "lucile.shanahan@example.org",
+          "889-940-2676",
+          "+02(1)0259033559"
+        ],
+        [
+          "uboehm@example.org",
+          "(369)908-7311x065",
+          "325-155-0801x7005"
+        ],
+        [
+          "lourdes.lowe@example.net",
+          "00230569697",
+          "312.216.3352"
+        ],
+        [
+          "mekhi.little@example.org",
+          "011.193.9081x3186",
+          "1-609-566-2752x25197"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "singer",
+    "context": "(cypher) Show the names of singers and the total sales of their songs. | singer | ROOT__singer: uri, singer__birth_year, singer__name, singer__citizenship, singer__singer_id, singer__net_worth_millions | ROOT__song: uri, song__title, song__singer_id, song__song_id, song__highest_position, song__sales, song__SINGER_ID",
+    "pred_query_processed": "match (T1:ROOT__singer) with sum(T1.singer__sales) as aggregation_t1_sales_72, T1.singer__sales as t1_sales return t1_sales_72, aggregation_t1_sales_72",
+    "gold_query_processed": "match (t2:ROOT__song)-[:song__SINGER_ID]->(t1:ROOT__singer) with sum(t2.song__sales) as aggregation_t2_sales_149, t1.singer__name as t1_name return t1_name, aggregation_t2_sales_149",
+    "gold_sql_processed": "match (t2:ROOT__song)-[:song__SINGER_ID]->(t1:ROOT__singer) with sum(t2.song__sales) as aggregation_t2_sales_149, t1.singer__name as t1_name return t1_name, aggregation_t2_sales_149",
+    "pred_exec": {
+      "status": "exception",
+      "exception": {
+        "type": "CypherSyntaxError",
+        "message": "{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `t1_sales_72` not defined (line 1, column 116 (offset: 115))\n\"match (T1:ROOT__singer) with sum(T1.singer__sales) as aggregation_t1_sales_72, T1.singer__sales as t1_sales return t1_sales_72, aggregation_t1_sales_72\"\n                                                                                                                    ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Variable `t1_sales_72` not defined (line 1, column 116 (offset: 115))\n\"match (T1:ROOT__singer) with sum(T1.singer__sales) as aggregation_t1_sales_72, T1.singer__sales as t1_sales return t1_sales_72, aggregation_t1_sales_72\"\n                                                                                                                    ^}"
+      }
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Susanne Klatten",
+          261000.0
+        ],
+        [
+          "Liliane Bettencourt",
+          1646407.0
+        ],
+        [
+          "Christy Walton",
+          651421.0
+        ],
+        [
+          "Iris Fontbona",
+          335000.0
+        ],
+        [
+          "Jacqueline Mars",
+          275000.0
+        ]
+      ]
+    }
+  }
+]

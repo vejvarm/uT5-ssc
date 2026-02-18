@@ -1,0 +1,238 @@
+[
+  {
+    "db_id": "concert_singer",
+    "context": "(cypher) What is the average, minimum, and maximum age of all singers from France? | concert_singer | singer_in_concert: CONCERT_ID, SINGER_ID | concert: year, concert_name, concert_id, theme, STADIUM_ID | singer: age, country, singer_id, song_name, name, is_male, song_release_year | stadium: location, lowest, stadium_id, highest, capacity, average, stadium__name",
+    "pred_query_processed": "match (T1:artist) where T1.singer__country = 'France' with avg(T1.singer__age) as aggregation_t1_age_93, min(T1.singer__age) as aggregation_t1_age_161 return aggregation_t1_age_93, aggregation_t1_age_161",
+    "gold_query_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "gold_sql_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null,
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          34.5,
+          25,
+          43
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "concert_singer",
+    "context": "(cypher) What is the average, minimum, and maximum age for all French singers? | concert_singer | singer_in_concert: CONCERT_ID, SINGER_ID | concert: year, concert_name, concert_id, theme, STADIUM_ID | singer: age, country, singer_id, song_name, name, is_male, song_release_year | stadium: location, lowest, stadium_id, highest, capacity, average, stadium__name",
+    "pred_query_processed": "match (T1:artist) where T1.singer__country = 'Germany' with avg(T1.singer__age) as aggregation_t1_age_93, min(T1.singer__age) as aggregation_t1_age_161 return aggregation_t1_age_93, aggregation_t1_age_161",
+    "gold_query_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "gold_sql_processed": "match (t1:ROOT__singer) where t1.singer__country = 'France' with avg(t1.singer__age) as aggregation_t1_age_25, min(t1.singer__age) as aggregation_t1_age_52, max(t1.singer__age) as aggregation_t1_age_136 return aggregation_t1_age_25, aggregation_t1_age_52, aggregation_t1_age_136",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null,
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          34.5,
+          25,
+          43
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "battle_death",
+    "context": "(cypher) List the name, date and result of each battle. | battle_death | death: note, death__id, killed, injured, CAUSED_BY_SHIP_ID | battle: bulgarian_commander, battle__name, date, battle__id, result, latin_commander | ship: disposition_of_ship, ship_type, id, tonnage, location, name, LOST_IN_BATTLE",
+    "pred_query_processed": "match (T1: ROOT__battle) return T1. battle__name as t1_name, T1.battle__date as t1_date, T1.battle__result as t1_result",
+    "gold_query_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+    "gold_sql_processed": "match (t1:ROOT__battle) return t1.battle__name as t1_name, t1.battle__date as t1_date",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Battle of Philippopolis",
+          "31 June 1208",
+          "Latin victory"
+        ],
+        [
+          "Siege of Constantinople",
+          "1235",
+          "Two Year Truce"
+        ],
+        [
+          "Battle of Messinopolis",
+          "4 September 1207",
+          "Bulgarian victory"
+        ],
+        [
+          "Battle of Boruy",
+          "June 1205",
+          "Bulgarian victory"
+        ],
+        [
+          "Battle of Rusion",
+          "31 January 1206",
+          "Bulgarian victory"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Battle of Philippopolis",
+          "31 June 1208"
+        ],
+        [
+          "Siege of Constantinople",
+          "1235"
+        ],
+        [
+          "Battle of Messinopolis",
+          "4 September 1207"
+        ],
+        [
+          "Battle of Boruy",
+          "June 1205"
+        ],
+        [
+          "Battle of Rusion",
+          "31 January 1206"
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "battle_death",
+    "context": "(cypher) What is maximum and minimum death toll caused each time? | battle_death | death: note, death__id, killed, injured, CAUSED_BY_SHIP_ID | battle: bulgarian_commander, battle__name, date, battle__id, result, latin_commander | ship: disposition_of_ship, ship_type, id, tonnage, location, name, LOST_IN_BATTLE",
+    "pred_query_processed": "match (T1:ROOT__death) with max(T1.total) as aggregation_t1_total_81, min(T1.total) as aggregation_t1_total_11, T1.death as t1_death return aggregation_t1_total_81, aggregation_t1_total_11, t1_death",
+    "gold_query_processed": "match (t1:ROOT__death) with max(t1.death__killed) as aggregation_t1_killed_150, min(t1.death__killed) as aggregation_t1_killed_146 return aggregation_t1_killed_150, aggregation_t1_killed_146",
+    "gold_sql_processed": "match (t1:ROOT__death) with max(t1.death__killed) as aggregation_t1_killed_150, min(t1.death__killed) as aggregation_t1_killed_146 return aggregation_t1_killed_150, aggregation_t1_killed_146",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          29,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "student_transcripts_tracking",
+    "context": "(cypher) How many times at most can a course enrollment result show in different transcripts? Also show the course enrollment id. | student_transcripts_tracking | students: date_first_registered, email_address, student_id, cell_mobile_number, last_name, first_name, middle_name, other_student_details, ssn, date_left, CURRENT_ADDRESS_ID, PERMANENT_ADDRESS_ID | semesters: semester_name, semester_id, semester_description | student_enrolment: student_enrolment_id, DEGREE_PROGRAM_ID, SEMESTER_ID, STUDENT_ID | sections: section_name, section_description, section_id, COURSE_ID | addresses: zip_postcode, line_2, country, address_id, city, state_province_county, line_1 | transcripts: transcript_date, transcript_id | transcript_contents: STUDENT_COURSE_ID, TRANSCRIPT_ID | degree_programs: degree_summary_name, degree_program_id, degree_summary_description, DEPARTMENT_ID | departments: department_description, department_id, department_name | student_enrolment_courses: student_course_id, student_enrolment_courses__COURSE_ID, STUDENT_ENROLMENT_ID | courses: course_name, course_id, course_description",
+    "pred_query_processed": "match (T1:ROOT__student_enrolment) with count(  T1.student_enrolment__student_enrolment_id) as aggregation_t1_student_enrolment_id_81 return   aggregation_t1_student_enrolment_id_81",
+    "gold_query_processed": "match (t1:ROOT__transcript_contents) with count(*) as aggregation_all, t1.transcript_contents__student_course_id as t1_student_course_id return aggregation_all, t1_student_course_id order by aggregation_all desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__transcript_contents) with count(*) as aggregation_all, t1.transcript_contents__student_course_id as t1_student_course_id return aggregation_all, t1_student_course_id order by aggregation_all desc limit 1",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          15
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          4,
+          0
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) What is the country with the most number of TV Channels and how many does it have? | tvshow | tv_series: tv_series__id, episode, share, viewers_m, rating, weekly_rank, air_date, rating_share, tv_series__CHANNEL | cartoon: title, original_air_date, written_by, directed_by, cartoon__id, production_code, CHANNEL | tv_channel: country, language, package_option, pay_per_view_ppv, content, series_name, high_definition_tv, pixel_aspect_ratio_par, id",
+    "pred_query_processed": "match (T1:ROOT__tv_channel) return T1.tv_channel__country as t1_country order by T1.sales_per_view_ppv desc limit 1",
+    "gold_query_processed": "match (t1:ROOT__tv_channel) with count(*) as aggregation_all, t1.tv_channel__country as t1_country return t1_country, aggregation_all order by aggregation_all desc limit 1",
+    "gold_sql_processed": "match (t1:ROOT__tv_channel) with count(*) as aggregation_all, t1.tv_channel__country as t1_country return t1_country, aggregation_all order by aggregation_all desc limit 1",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Italy"
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          "Italy",
+          12
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) List the number of different series names and contents in the TV Channel table. | tvshow | tv_series: tv_series__id, episode, share, viewers_m, rating, weekly_rank, air_date, rating_share, tv_series__CHANNEL | cartoon: title, original_air_date, written_by, directed_by, cartoon__id, production_code, CHANNEL | tv_channel: country, language, package_option, pay_per_view_ppv, content, series_name, high_definition_tv, pixel_aspect_ratio_par, id",
+    "pred_query_processed": "match (T1:ROOT__tv_series)-[:cartoon__CHANNEL]->(T2:ROOT__tv_series) where T2.name = 'TV Channel' with count(  T1.tv_channel__series_name) as aggregation_t1_series_name_28 return   aggregation_t1_series_name_28",
+    "gold_query_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "gold_sql_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          0
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          15,
+          15
+        ]
+      ]
+    }
+  },
+  {
+    "db_id": "tvshow",
+    "context": "(cypher) How many different series and contents are listed in the TV Channel table? | tvshow | tv_series: tv_series__id, episode, share, viewers_m, rating, weekly_rank, air_date, rating_share, tv_series__CHANNEL | cartoon: title, original_air_date, written_by, directed_by, cartoon__id, production_code, CHANNEL | tv_channel: country, language, package_option, pay_per_view_ppv, content, series_name, high_definition_tv, pixel_aspect_ratio_par, id",
+    "pred_query_processed": "match (T1:ROOT__tv_series) where T1.channel = 'TV Channel' with count(  T1.volume) as aggregation_t1_volume_183 return   aggregation_t1_volume_183",
+    "gold_query_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "gold_sql_processed": "match (t1:ROOT__tv_channel) with count(  t1.tv_channel__series_name) as aggregation_t1_series_name_136, count(  t1.tv_channel__content) as aggregation_t1_content_102 return   aggregation_t1_series_name_136, aggregation_t1_content_102",
+    "pred_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          0
+        ]
+      ]
+    },
+    "gold_exec": {
+      "status": "result",
+      "normalized_rows": [
+        [
+          15,
+          15
+        ]
+      ]
+    }
+  }
+]

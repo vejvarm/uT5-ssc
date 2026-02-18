@@ -73,9 +73,9 @@ docker start neo4j_server
 # python -m seq2seq.run_seq2seq configs/8_eval/clean/cypher_no-schema.json 
 
 # # dirty
-# python -m seq2seq.run_seq2seq configs/8_eval/dirty/sql_compact.json
-# python -m seq2seq.run_seq2seq configs/8_eval/dirty/sparql_compact.json
-# python -m seq2seq.run_seq2seq configs/8_eval/dirty/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/8_eval/dirty/sql_compact.json
+python -m seq2seq.run_seq2seq configs/8_eval/dirty/sparql_compact.json
+python -m seq2seq.run_seq2seq configs/8_eval/dirty/cypher_compact.json
 
 # # injected10p
 # python -m seq2seq.run_seq2seq configs/8_eval/injected10p/sql_compact.json
@@ -99,12 +99,12 @@ docker start neo4j_server
 # python -m seq2seq.run_seq2seq configs/8_eval/cypher_short/cypher_norange_strip_root_only.json
 
 # joint clean RQ5
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/cypher_norange.json
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/cypher_compact.json
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sparql_norange.json
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sparql_compact.json
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sql_norange.json
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sql_compact.json
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sql_no-schema.json
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sparql_no-schema.json 
-python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/cypher_no-schema.json 
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/cypher_norange.json
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/cypher_compact.json
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sparql_norange.json
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sparql_compact.json
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sql_norange.json
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sql_compact.json
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sql_no-schema.json
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/sparql_no-schema.json 
+# python -m seq2seq.run_seq2seq configs/8_eval/clean-rq5/cypher_no-schema.json 

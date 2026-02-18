@@ -61,12 +61,12 @@ docker start rdf4j_server_ssc_test
 docker start neo4j_server_ssc_test
 
 # Run predictions on test set with uT5-clean models
-# python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sql_norange.json
-# python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sparql_norange.json
-# python -m seq2seq.run_seq2seq configs/8_predict/t5_single/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sql_norange.json
+python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sparql_norange.json
+python -m seq2seq.run_seq2seq configs/8_predict/t5_single/cypher_norange.json
 # python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sql_compact.json
 # python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sparql_compact.json
-python -m seq2seq.run_seq2seq configs/8_predict/t5_single/cypher_compact.json
-# python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sql_no-schema.json
-# python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sparql_no-schema.json 
-# python -m seq2seq.run_seq2seq configs/8_predict/t5_single/cypher_no-schema.json 
+# python -m seq2seq.run_seq2seq configs/8_predict/t5_single/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sql_no-schema.json
+python -m seq2seq.run_seq2seq configs/8_predict/t5_single/sparql_no-schema.json 
+python -m seq2seq.run_seq2seq configs/8_predict/t5_single/cypher_no-schema.json 
