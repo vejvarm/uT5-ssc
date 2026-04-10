@@ -6,8 +6,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple, List
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
 
 
 def _get_colors_bright():
@@ -715,6 +717,114 @@ def _plot_by_pretrain_compact(df_files: pd.DataFrame, out_dir: Path) -> None:
         )
 
 
+def _lighten(color: str, amount: float = 0.5) -> tuple[float, float, float, float]:
+    rgba = np.array(to_rgba(color))
+    white = np.array([1.0, 1.0, 1.0, 1.0])
+    return tuple(rgba + (white - rgba) * amount)
+
+
+def _plot_rq3_ex_vs_inverse_complexity(
+    df_rq3_long: pd.DataFrame,
+    out_dir: Path,
+    rq3_tag: str,
+    split_label: str,
+) -> List[Path]:
+    required_cols = {"lang", "hardness", "exec_accuracy", "inverse_complexity"}
+    if df_rq3_long.empty or not required_cols.issubset(df_rq3_long.columns):
+        return []
+
+    hardness = list(HARDNESS_ORDER)
+    lang_keys = list(LANG_ORDER)
+    lang_labels = ["SPARQL", "SQL", "Cypher"]
+    colors = {
+        "SPARQL": "#2F7B3B",
+        "SQL": "#BCAE55",
+        "Cypher": "#51779C",
+    }
+
+    grouped = (
+        df_rq3_long.groupby(["lang", "hardness"], dropna=False, as_index=False)
+        .agg(
+            exec_accuracy=("exec_accuracy", "mean"),
+            inverse_complexity=("inverse_complexity", "mean"),
+        )
+    )
+
+    ex = np.zeros((len(lang_keys), len(hardness)), dtype=float)
+    inv_complexity = np.zeros((len(lang_keys), len(hardness)), dtype=float)
+    lang_idx = {lang: idx for idx, lang in enumerate(lang_keys)}
+    hardness_idx = {level: idx for idx, level in enumerate(hardness)}
+
+    for row in grouped.itertuples(index=False):
+        lang = str(row.lang).lower()
+        level = str(row.hardness).lower()
+        if lang not in lang_idx or level not in hardness_idx:
+            continue
+        i = lang_idx[lang]
+        j = hardness_idx[level]
+
+        if pd.notna(row.exec_accuracy):
+            ex[i, j] = float(row.exec_accuracy)
+
+        inv_val = float(row.inverse_complexity) if pd.notna(row.inverse_complexity) else 0.0
+        if lang in ("sparql", "cypher"):
+            inv_val = 0.0
+        inv_complexity[i, j] = inv_val
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bar_width = 0.22
+    index = np.arange(len(hardness))
+
+    for i, lang_label in enumerate(lang_labels):
+        color_ex = colors[lang_label]
+        color_inv = _lighten(color_ex, 0.5)
+        ax.bar(
+            index + i * bar_width,
+            inv_complexity[i],
+            bar_width,
+            label=f"{lang_label} 1/C(q)",
+            color=color_inv,
+            hatch="//",
+        )
+        ax.bar(
+            index + i * bar_width,
+            ex[i],
+            bar_width,
+            label=f"{lang_label} EX",
+            color=color_ex,
+        )
+
+    ax.set_xlabel("Hardness Level")
+    ax.set_ylabel("EX / Inverse complexity score")
+    ax.set_title(
+        "Execution accuracy and Inverse Complexity Grouped by Hardness Level and Query Language"
+    )
+    ax.set_xticks(index + bar_width)
+    ax.set_xticklabels(hardness)
+
+    handles, labels = ax.get_legend_handles_labels()
+    seen = set()
+    unique_handles = []
+    unique_labels = []
+    for handle, label in zip(handles, labels):
+        if label not in seen:
+            unique_handles.append(handle)
+            unique_labels.append(label)
+            seen.add(label)
+    ax.legend(unique_handles, unique_labels, ncol=2, frameon=False)
+
+    plt.tight_layout()
+    plot_base = out_dir / f"rq3_ex_vs_inverse-complexity_{rq3_tag}_{split_label}"
+    png_path = plot_base.with_suffix(".png")
+    pdf_path = plot_base.with_suffix(".pdf")
+    svg_path = plot_base.with_suffix(".svg")
+    plt.savefig(png_path, dpi=300)
+    plt.savefig(pdf_path, bbox_inches="tight")
+    plt.savefig(svg_path, bbox_inches="tight")
+    plt.close(fig)
+    return [png_path, pdf_path, svg_path]
+
+
 def _summary_dict_to_df(summary_dict: Dict[str, Dict[str, Any]], key_name: str) -> pd.DataFrame:
     rows = []
     for key, stats in summary_dict.items():
@@ -1195,11 +1305,19 @@ def main() -> None:
     rq3_latex = out_dir / f"rq3_ex_by_hardness_lang_{rq3_tag}_{split_label}.tex"
     rq3_complexity_latex = out_dir / f"rq3_complexity_by_hardness_lang_{rq3_tag}_{split_label}.tex"
     rq3_inv_complexity_latex = out_dir / f"rq3_inverse_complexity_by_hardness_lang_{rq3_tag}_{split_label}.tex"
+    rq3_plot_paths: List[Path] = []
     df_rq3_ex.to_csv(rq3_ex_csv)
     df_rq3_counts.to_csv(rq3_counts_csv)
     df_rq3_complexity_disp.to_csv(rq3_complexity_csv)
     df_rq3_inv_complexity_disp.to_csv(rq3_inv_complexity_csv)
     df_rq3_long.to_csv(rq3_long_csv, index=False)
+    if not df_rq3_long.empty:
+        rq3_plot_paths = _plot_rq3_ex_vs_inverse_complexity(
+            df_rq3_long=df_rq3_long,
+            out_dir=out_dir,
+            rq3_tag=rq3_tag,
+            split_label=split_label,
+        )
     if not df_rq3_ex.empty:
         df_rq3_ex.round(2).to_latex(rq3_latex, float_format="%.2f")
     if not df_rq3_complexity_disp.empty:
@@ -1217,6 +1335,8 @@ def main() -> None:
         print(f"Wrote RQ3 complexity LaTeX table: {rq3_complexity_latex}")
     if not df_rq3_inv_complexity_disp.empty:
         print(f"Wrote RQ3 inverse complexity LaTeX table: {rq3_inv_complexity_latex}")
+    for plot_path in rq3_plot_paths:
+        print(f"Wrote RQ3 EX vs inverse complexity plot: {plot_path}")
     if rq3_stats:
         print(f"RQ3 hardness row stats: {json.dumps(rq3_stats, sort_keys=True)}")
     if df_rq3_long.empty:

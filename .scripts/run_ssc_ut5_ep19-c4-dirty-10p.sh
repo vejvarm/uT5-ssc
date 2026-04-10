@@ -32,16 +32,18 @@ source ~/miniconda3/bin/activate ./.conda
 # ______________________
 
 # __ON SUBSEQUENT RUNS__
+docker stop rdf4j_server_ssc_test
+docker stop neo4j_server_ssc_test
 docker start rdf4j_server
 docker start neo4j_server
 
 
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/cypher_compact.json
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sql_compact.json
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sparql_compact.json
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sql_norange.json
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sparql_norange.json
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/cypher_norange.json
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sql_no-schema.json 
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/sparql_no-schema.json 
-python -m seq2seq.run_seq2seq configs/5_ut5-ep19-dirty/cypher_no-schema.json 
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/cypher_compact.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sql_compact.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sparql_compact.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sql_norange.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sparql_norange.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/cypher_norange.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sql_no-schema.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sparql_no-schema.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/cypher_no-schema.json
