@@ -34,6 +34,58 @@ bash .scripts/eval_ssc_ut5_ep19-clean-2048.sh
 ```
 Each config sets model checkpoints (uT5 base, EP19), schema serialization (`compact`, `norange`, `no-schema`), context length, and output directories so you can match the exact paper runs. Swap configs across the `5_*` and `6_*` folders to reproduce different training/eval conditions.
 
+## Reproducing the C4 Spider4SSC runs
+
+The C4-pretrained checkpoints are produced in the sibling repository
+`~/git/balanced-plms`. The SSC configs committed here currently cover two C4
+variants:
+
+* `c4-clean`, which expects
+  `/work/results/t5/ut5-ep19-c4-clean/final_mixed_grouped_dirty0p`
+* `c4-dirty-10p`, which expects
+  `/work/results/t5/ut5-ep19-c4-dirty-10p/final_mixed_grouped`
+
+Before launching the fine-tuning jobs, make sure those pretraining runs have
+completed in `balanced-plms` and that the Spider4SSC RDF4j and Neo4j services
+are initialized as described in `.scripts/init.sh`.
+
+### Run the full single-language C4 fine-tuning sweeps
+
+Each wrapper below launches all 9 single-language runs for one C4 variant:
+
+* SQL: `compact`, `norange`, `no-schema`
+* SPARQL: `compact`, `norange`, `no-schema`
+* Cypher: `compact`, `norange`, `no-schema`
+
+```bash
+cd ~/git/uT5-ssc
+source ~/miniconda3/bin/activate ./.conda
+
+bash .scripts/run_ssc_ut5_ep19-c4-clean.sh
+bash .scripts/run_ssc_ut5_ep19-c4-dirty-10p.sh
+```
+
+The exact config folders are:
+
+* `configs/5_ut5-ep19-c4-clean/`
+* `configs/5_ut5-ep19-c4-dirty-10p/`
+
+The outputs land under:
+
+* `/work/results/ut5-base/Spider4SSC/c4-clean/ep19/...`
+* `/work/results/ut5-base/Spider4SSC/c4-dirty-10p/ep19/...`
+
+If you want to launch a single run instead of the whole sweep, call
+`seq2seq.run_seq2seq` directly on an individual config, for example:
+
+```bash
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-clean/sql_compact.json
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sql_compact.json
+```
+
+At the moment, this repository does not contain a committed
+`c4-dirty-15p` SSC fine-tuning config set.
+
 ## Analysis Artifacts
 - Token complexity (RQ4): `RQ4_token_count_analysis_new.ipynb`, driven by `seq2seq/count_tokens.py`.
 - Cross-language comparisons (RQ1–RQ3): see `RQ1andRQ2_compare_runs-bias.py`, `RQ4_compare_langs_and_schemas.py`, and `RQ4andRQ5_gather_eval_results.ipynb`.
