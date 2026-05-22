@@ -16,6 +16,7 @@ from seq2seq.utils.cypher_identifier_mapping import (
     IdentifierMapping,
     normalize_cypher_schema,
 )
+from seq2seq.utils.query_tokenizer import batch_decode_query_tokens
 from seq2seq.utils.trainer import Seq2SeqTrainer, EvalPrediction
 
 from seq2seq.utils.helpers import replace_custom_datatypes
@@ -352,10 +353,16 @@ class SpiderTrainer(Seq2SeqTrainer):
                 for label_seq in label_ids
             ]
 
-        decoded_label_ids = self.tokenizer.batch_decode(_label_ids, skip_special_tokens=True)
-        decoded_label_ids = [d.replace("</s>", "").replace("<pad>", "").replace("{{", "{").replace("}}", "}").replace("< >", "<>").strip() for d in decoded_label_ids]
-        predictions = self.tokenizer.batch_decode(predictions, skip_special_tokens=False)
-        predictions = [d.replace("</s>", "").replace("<pad>", "").replace("{{", "{").replace("}}", "}").replace("< >", "<>").strip() for d in predictions]
+        decoded_label_ids = batch_decode_query_tokens(
+            self.tokenizer,
+            _label_ids,
+            skip_special_tokens=True,
+        )
+        predictions = batch_decode_query_tokens(
+            self.tokenizer,
+            predictions,
+            skip_special_tokens=False,
+        )
         
         logs = []
         metas = []

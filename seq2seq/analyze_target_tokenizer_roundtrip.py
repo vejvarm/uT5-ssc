@@ -16,15 +16,16 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tokenizers import AddedToken
 from transformers.models.auto import AutoTokenizer
-from transformers.models.t5.tokenization_t5_fast import T5TokenizerFast
 from transformers.tokenization_utils_fast import PreTrainedTokenizerFast
 
 from third_party.test_suite import exec_eval
+from seq2seq.utils.query_tokenizer import (
+    add_t5_query_tokens,
+    decode_query_tokens,
+)
 
 LANGUAGES = ("sql", "sparql", "cypher")
-T5_EXTRA_TOKENS = [" {", " }", " <=", " <", "^^"]
 LEXICAL_ITEM_RE = re.compile(
     r"\?[A-Za-z_][A-Za-z0-9_]*|:[A-Za-z_][A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*|\S"
 )
@@ -145,8 +146,7 @@ def load_tokenizer(tokenizer_name_or_path: str) -> PreTrainedTokenizerFast:
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name_or_path, use_fast=True)
     if not isinstance(tokenizer, PreTrainedTokenizerFast):
         raise TypeError("Only fast tokenizers are supported")
-    if isinstance(tokenizer, T5TokenizerFast):
-        tokenizer.add_tokens([AddedToken(tok, normalized=True) for tok in T5_EXTRA_TOKENS])
+    add_t5_query_tokens(tokenizer)
     return tokenizer
 
 
@@ -173,7 +173,12 @@ def audit_examples(
                 continue
 
             encoded = tokenizer.encode(gold_query, add_special_tokens=True)
-            decoded_query = tokenizer.decode(encoded, skip_special_tokens=True)
+            raw_decoded_query = tokenizer.decode(encoded, skip_special_tokens=False)
+            decoded_query = decode_query_tokens(
+                tokenizer,
+                encoded,
+                skip_special_tokens=False,
+            )
             lexical_count = count_lexical_items(gold_query)
             normalized_original = normalize_for_match(gold_query)
             normalized_decoded = normalize_for_match(decoded_query)
@@ -196,6 +201,7 @@ def audit_examples(
                     "db_id": example["db_id"],
                     "language": language,
                     "original_query": gold_query,
+                    "raw_decoded_query": raw_decoded_query,
                     "decoded_query": decoded_query,
                     "token_count": len(encoded),
                     "lexical_item_count": lexical_count,

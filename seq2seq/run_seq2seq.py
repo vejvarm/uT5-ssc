@@ -30,12 +30,11 @@ from transformers.models.auto import AutoConfig, AutoTokenizer, AutoModelForSeq2
 from transformers.data.data_collator import DataCollatorForSeq2Seq
 from transformers.trainer_utils import get_last_checkpoint, set_seed
 from transformers.models.t5.modeling_t5 import T5ForConditionalGeneration
-from transformers.models.t5.tokenization_t5_fast import T5TokenizerFast
 from transformers.tokenization_utils_fast import PreTrainedTokenizerFast
-from tokenizers import AddedToken
 from seq2seq.utils.args import ModelArguments
 from seq2seq.utils.dataset import DataTrainingArguments, DataArguments
 from seq2seq.utils.dataset_loader import load_dataset
+from seq2seq.utils.query_tokenizer import add_t5_query_tokens
 from seq2seq.utils.spider import SpiderTrainer
 from seq2seq.utils.cosql import CoSQLTrainer
 
@@ -149,11 +148,7 @@ def main() -> None:
         use_auth_token=True if model_args.use_auth_token else None,
     )
     assert isinstance(tokenizer, PreTrainedTokenizerFast), "Only fast tokenizers are currently supported"
-    if isinstance(tokenizer, T5TokenizerFast):
-        # In T5 `<` is OOV, see https://github.com/google-research/language/blob/master/language/nqg/tasks/spider/restore_oov.py
-        specials = ["{", "}", " <=", " <", "^^"]
-        added = [AddedToken(tok, normalized=True) for tok in specials]
-        tokenizer.add_tokens(added)
+    add_t5_query_tokens(tokenizer)
 
     # Load dataset
     metric, dataset_splits = load_dataset(

@@ -7,13 +7,12 @@ from transformers.hf_argparser import HfArgumentParser
 from transformers.training_args_seq2seq import Seq2SeqTrainingArguments
 from transformers.models.auto import AutoTokenizer
 from transformers.tokenization_utils_fast import PreTrainedTokenizerFast
-from transformers.models.t5.tokenization_t5_fast import T5TokenizerFast
-from tokenizers import AddedToken
 
 # project utils
 from seq2seq.utils.args import ModelArguments
 from seq2seq.utils.dataset import DataTrainingArguments, DataArguments
 from seq2seq.utils.dataset_loader import load_dataset
+from seq2seq.utils.query_tokenizer import add_t5_query_tokens
 
 def main():
     # Parse args (same way as your full script)
@@ -78,9 +77,7 @@ def main():
         use_auth_token=True if model_args.use_auth_token else None,
     )
     assert isinstance(tokenizer, PreTrainedTokenizerFast), "Only fast tokenizers are supported"
-    if isinstance(tokenizer, T5TokenizerFast):
-        specials = [" {", " }", " <=", " <", "^^"]
-        tokenizer.add_tokens([AddedToken(tok, normalized=True) for tok in specials])
+    add_t5_query_tokens(tokenizer)
 
     # Load dataset splits
     _, dataset_splits = load_dataset(
