@@ -2,6 +2,16 @@
 
 Use this file as the reverse-chronological engineering log for `uT5-ssc`.
 
+### 2026-05-22 (local) - Added reproducibility and tokenizer-audit guide
+- Scope: `README.md`, `docs/reproducibility.md`.
+- Problem: reviewer-facing reproduction steps for the repository were split between the README, shell scripts, and local engineering notes, and the corrected tokenizer audit needed a stable public command reference.
+- Changes:
+  - added a dedicated reproducibility guide covering environment validation, datastore service setup, fine-tuning/evaluation commands, tokenizer round-trip audit execution, output files, interpretation, and validation commands,
+  - added README pointers to the guide and a concise target-query tokenizer audit section,
+  - documented that the corrected audit matches the original training/evaluation tokenizer and decode path, so model runs do not need to be repeated for this audit correction.
+- Validation:
+  - checked `.scripts/init.sh`, `seq2seq/serve_rdf4j_graphs.py`, `seq2seq/serve_neo4j_graphs.py`, and the corrected audit outputs in `results/tokenizer_roundtrip/dev/` before writing the guide.
+
 ### 2026-05-22 (local) - Aligned tokenizer round-trip audit with training/evaluation decoding
 - Scope: `seq2seq/utils/query_tokenizer.py`, `seq2seq/analyze_target_tokenizer_roundtrip.py`, `seq2seq/run_seq2seq.py`, `seq2seq/count_tokens.py`, `seq2seq/utils/spider.py`, `seq2seq/utils/tests/test_target_tokenizer_roundtrip.py`.
 - Problem: the initial tokenizer audit used spaced brace tokens and did not apply the generated-prediction decode cleanup used by evaluation, making two SPARQL final-brace failures and several Cypher `< >` failures audit artefacts.

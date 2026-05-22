@@ -17,7 +17,10 @@ pip install -r requirements.txt
 Running any training config triggers an automatic download of the Spider4SSC bundle (SQL/SPARQL/Cypher splits plus RDF/Neo4j DBs) via the Hugging Face datasets loader under `seq2seq/datasets/ssc`. Set `HF_DATASETS_CACHE` if you want to reuse the archive across experiments.
 
 ## Serving the Knowledge Graphs
-Refer to [.scripts/init.sh](.scripts/init.sh) for how to set up and initilalize the Neo4j and RDF4j databases with Spider4SSC knowledge graphs.
+Refer to [.scripts/init.sh](.scripts/init.sh) for how to set up and initialize the Neo4j and RDF4j databases with Spider4SSC knowledge graphs.
+
+## Reproducibility Guide
+For a fuller reproduction checklist covering the conda environment, datastore services, fine-tuning/evaluation commands, and tokenizer audits, see [docs/reproducibility.md](docs/reproducibility.md).
 
 ## Training & Evaluation Cheatsheet
 ```bash
@@ -140,5 +143,18 @@ separately and continue to point at the original non-pool6x pretraining runs.
 - Token complexity (RQ4): `RQ4_token_count_analysis_new.ipynb`, driven by `seq2seq/count_tokens.py`.
 - Cross-language comparisons (RQ1–RQ3): see `RQ1andRQ2_compare_runs-bias.py`, `RQ4_compare_langs_and_schemas.py`, and `RQ4andRQ5_gather_eval_results.ipynb`.
 All notebooks assume the prediction JSON files emitted into `/work/results/ut5-base/Spider4SSC/...` by the configs above.
+
+## Target-Query Tokenizer Audit
+The target-query tokenizer round-trip audit is implemented in `seq2seq/analyze_target_tokenizer_roundtrip.py`. It uses the same T5 query extra tokens and generated-prediction decode cleanup as `seq2seq/run_seq2seq.py` and `seq2seq/utils/spider.py`.
+
+```bash
+conda run -p ./.conda env \
+  TOKENIZER_NAME_OR_PATH=/home/vejvar-martin-nj/git/balanced-plms/results/t5/unbiased-openwebtext-10k/clean \
+  python seq2seq/analyze_target_tokenizer_roundtrip.py \
+    --split dev \
+    --output-dir results/tokenizer_roundtrip/dev
+```
+
+The corrected dev audit reports execution-equivalent round trips for all 608 gold queries in each language: SQL, SPARQL, and Cypher. SPARQL remains much more token-fragmented than SQL, but deterministic tokenizer round trips do not corrupt gold-query semantics. See [docs/reproducibility.md](docs/reproducibility.md#target-query-tokenizer-round-trip-audit) for outputs, interpretation, and validation commands.
 
 For questions or replication clarifications, cite the paper and reference this repository in supplementary materials.
