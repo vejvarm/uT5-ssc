@@ -86,6 +86,56 @@ python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-10p/sql_compact.json
 At the moment, this repository does not contain a committed
 `c4-dirty-15p` SSC fine-tuning config set.
 
+### Expanded pool6x C4 ladder (`0%`, `10%`, `30%`, `60%`)
+
+The expanded C4 ladder is trained from a separate pooled dataset root in the
+sibling `balanced-plms` repository:
+
+* `/work/datasets/c4-en-noclean-match-owt-clean-dirtypool6x`
+
+It expects these pretraining checkpoints:
+
+* `/work/results/t5/ut5-ep19-c4-clean-pool6x/final_mixed_grouped_dirty0p`
+* `/work/results/t5/ut5-ep19-c4-dirty-10p-pool6x/final_mixed_grouped_dirty10p`
+* `/work/results/t5/ut5-ep19-c4-dirty-30p-pool6x/final_mixed_grouped_dirty30p`
+* `/work/results/t5/ut5-ep19-c4-dirty-60p-pool6x/final_mixed_grouped_dirty60p`
+
+Launch the full 9-run SSC sweeps with:
+
+```bash
+cd ~/git/uT5-ssc
+source ~/miniconda3/bin/activate ./.conda
+
+bash .scripts/run_ssc_ut5_ep19-c4-clean-pool6x.sh
+bash .scripts/run_ssc_ut5_ep19-c4-dirty-10p-pool6x.sh
+bash .scripts/run_ssc_ut5_ep19-c4-dirty-30p-pool6x.sh
+bash .scripts/run_ssc_ut5_ep19-c4-dirty-60p-pool6x.sh
+```
+
+The corresponding config folders are:
+
+* `configs/5_ut5-ep19-c4-clean-pool6x/`
+* `configs/5_ut5-ep19-c4-dirty-10p-pool6x/`
+* `configs/5_ut5-ep19-c4-dirty-30p-pool6x/`
+* `configs/5_ut5-ep19-c4-dirty-60p-pool6x/`
+
+The outputs land under:
+
+* `/work/results/ut5-base/Spider4SSC/c4-clean-pool6x/ep19/...`
+* `/work/results/ut5-base/Spider4SSC/c4-dirty-10p-pool6x/ep19/...`
+* `/work/results/ut5-base/Spider4SSC/c4-dirty-30p-pool6x/ep19/...`
+* `/work/results/ut5-base/Spider4SSC/c4-dirty-60p-pool6x/ep19/...`
+
+If you only want one run, call `seq2seq.run_seq2seq` on an individual config,
+for example:
+
+```bash
+python -m seq2seq.run_seq2seq configs/5_ut5-ep19-c4-dirty-30p-pool6x/sql_compact.json
+```
+
+The legacy `c4-clean` and `c4-dirty-10p` SSC configs remain available
+separately and continue to point at the original non-pool6x pretraining runs.
+
 ## Analysis Artifacts
 - Token complexity (RQ4): `RQ4_token_count_analysis_new.ipynb`, driven by `seq2seq/count_tokens.py`.
 - Cross-language comparisons (RQ1–RQ3): see `RQ1andRQ2_compare_runs-bias.py`, `RQ4_compare_langs_and_schemas.py`, and `RQ4andRQ5_gather_eval_results.ipynb`.
