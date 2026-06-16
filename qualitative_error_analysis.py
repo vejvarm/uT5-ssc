@@ -6,7 +6,9 @@ import math
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+from seq2seq.utils.db_id_filter import filter_records_by_db_id, load_db_id_filter
 
 try:
     from third_party.test_suite import exec_eval
@@ -389,10 +391,12 @@ def analyze_file(
     path: Path,
     max_entries: Optional[int] = None,
     use_label_as_gold: bool = False,
+    db_id_filter: Optional[Set[str]] = None,
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Any], Dict[str, List[Dict[str, Any]]]]:
     data = json.loads(path.read_text())
     if not isinstance(data, list):
         raise ValueError(f"Expected a list in {path}, got {type(data)}")
+    data = filter_records_by_db_id(data, db_id_filter)
     if max_entries is not None:
         data = data[:max_entries]
 
@@ -435,6 +439,32 @@ def analyze_file(
         "lang_counts": dict(lang_counts),
     }
     return analyzed, summary, fail_groups
+
+
+def summarize_analyzed_file(path: Path) -> Dict[str, Any]:
+    analyzed = json.loads(path.read_text())
+    if not isinstance(analyzed, list):
+        raise ValueError(f"Expected a list in {path}, got {type(analyzed)}")
+
+    category_counts: Counter = Counter()
+    match_count = 0
+    lang_counts: Counter = Counter()
+    for record in analyzed:
+        lang = (record.get("lang") or "").lower()
+        if lang:
+            lang_counts[lang] += 1
+        category_counts[_fail_group_key(record.get("fail_info", {}))] += 1
+        if record.get("match") == 1:
+            match_count += 1
+
+    total = len(analyzed)
+    return {
+        "total": total,
+        "matches": match_count,
+        "match_rate": (match_count / total) if total else 0.0,
+        "fail_categories": dict(category_counts),
+        "lang_counts": dict(lang_counts),
+    }
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -493,6 +523,23 @@ def main() -> None:
         default=None,
         help="Optional path for a global summary JSON (defaults depend on --mode).",
     )
+    parser.add_argument(
+        "--db-id-list",
+        type=str,
+        default=None,
+        help="Optional comma-separated db_id list to analyze.",
+    )
+    parser.add_argument(
+        "--db-id-file",
+        type=Path,
+        default=None,
+        help="Optional newline-separated db_id file to analyze.",
+    )
+    parser.add_argument(
+        "--summarize-existing",
+        action="store_true",
+        help="Build the global summary from existing execution-analysis files without running execution.",
+    )
     args = parser.parse_args()
 
     mode_defaults = MODE_DEFAULTS[args.mode]
@@ -500,6 +547,7 @@ def main() -> None:
     output_suffix = args.output_suffix or mode_defaults["output_suffix"]
     fail_info_dirname = args.fail_info_dirname or mode_defaults["fail_info_dirname"]
     use_label_as_gold = bool(mode_defaults["use_label_as_gold"])
+    db_id_filter = load_db_id_filter(args.db_id_list, args.db_id_file)
 
     root = Path(args.root)
     prediction_files = sorted(root.rglob(input_pattern))
@@ -508,7 +556,8 @@ def main() -> None:
         for p in prediction_files:
             print(p)
         return
-    _require_exec_eval()
+    if not args.summarize_existing:
+        _require_exec_eval()
 
     global_summary = {
         "root": str(root),
@@ -523,15 +572,20 @@ def main() -> None:
     by_lang_schema = defaultdict(lambda: {"total": 0, "matches": 0, "fail_categories": Counter()})
 
     for path in prediction_files:
-        analyzed, summary, fail_groups = analyze_file(
-            path,
-            max_entries=args.max_entries,
-            use_label_as_gold=use_label_as_gold,
-        )
-        output_path = path.with_name(output_suffix)
-        write_json(output_path, analyzed)
+        if args.summarize_existing:
+            summary = summarize_analyzed_file(path)
+            rel_path = str(path.with_name(path.name.replace("_exec_analysis", "")).relative_to(root))
+        else:
+            analyzed, summary, fail_groups = analyze_file(
+                path,
+                max_entries=args.max_entries,
+                use_label_as_gold=use_label_as_gold,
+                db_id_filter=db_id_filter,
+            )
+            output_path = path.with_name(output_suffix)
+            write_json(output_path, analyzed)
+            rel_path = str(path.relative_to(root))
 
-        rel_path = str(path.relative_to(root))
         global_summary["files"][rel_path] = summary
 
         dominant_lang = None
@@ -556,15 +610,16 @@ def main() -> None:
                 lang_schema_bucket["matches"] += summary["matches"]
                 lang_schema_bucket["fail_categories"].update(summary["fail_categories"])
 
-        fail_info_dir = path.parent / fail_info_dirname
-        if fail_info_dir.exists():
-            for existing in fail_info_dir.glob("*.json"):
-                existing.unlink()
-        else:
-            fail_info_dir.mkdir(parents=True, exist_ok=True)
-        for group_key, entries in fail_groups.items():
-            out_path = fail_info_dir / f"{group_key}.json"
-            write_json(out_path, entries)
+        if not args.summarize_existing:
+            fail_info_dir = path.parent / fail_info_dirname
+            if fail_info_dir.exists():
+                for existing in fail_info_dir.glob("*.json"):
+                    existing.unlink()
+            else:
+                fail_info_dir.mkdir(parents=True, exist_ok=True)
+            for group_key, entries in fail_groups.items():
+                out_path = fail_info_dir / f"{group_key}.json"
+                write_json(out_path, entries)
 
     for lang, stats in by_language.items():
         total = stats["total"]

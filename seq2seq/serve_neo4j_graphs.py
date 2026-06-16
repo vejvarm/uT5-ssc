@@ -4,11 +4,13 @@ import json
 import pathlib
 from itertools import chain
 from third_party.test_suite.neo4j_connector import Neo4jConnector  # Ensure your Neo4jConnector class is in this module
+from seq2seq.utils.db_id_filter import load_db_id_filter
 
 async def main(args):
     dataset_folder = args.dataset_folder
     split = args.split
     neo4j_root = args.neo4j_root
+    db_id_filter = load_db_id_filter(args.db_id_list, args.db_id_file)
 
     assert dataset_folder.exists(), "Dataset folder does not exist!"
 
@@ -36,6 +38,9 @@ async def main(args):
         
     # Extract unique knowledge graph names
     kg_names = set(entry["db_id"] for entry in chain(test_split, dev_split, train_split))
+    if db_id_filter is not None:
+        kg_names = kg_names & db_id_filter
+        print(f"Filtered Neo4j load to {len(kg_names)} requested database(s).")
 
     uname = "neo4j"
     password = "secretserver"
@@ -73,4 +78,6 @@ python seq2seq/serve_neo4j_graphs.py ~/git/uT5-ssc/.cache/downloads/extracted/c7
     parser.add_argument("dataset_folder", type=pathlib.Path, help="Path to the root of the Spider4SSC dataset folder")
     parser.add_argument("--split", default="dev", choices=["test", "dev", "train", "all"], help="Split for which to load the knowledge graphs")
     parser.add_argument("--neo4j-root", default=pathlib.Path("/neo4j/"), type=pathlib.Path, help="Root folder of the neo4j server on your drive")
+    parser.add_argument("--db-id-list", default=None, help="Optional comma-separated db_id list to load.")
+    parser.add_argument("--db-id-file", default=None, type=pathlib.Path, help="Optional newline-separated db_id file to load.")
     asyncio.run(main(parser.parse_args()))

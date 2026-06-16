@@ -151,7 +151,8 @@ class Seq2SeqTrainer(transformers.trainer_seq2seq.Seq2SeqTrainer):
             self.compute_metrics = compute_metrics
 
         run_metrics = self.compute_metrics is not None if compute_metrics is None else compute_metrics
-        if run_metrics:
+        eval_preds = None
+        if test_examples is not None and test_dataset is not None:
             # We might have removed columns from the dataset so we put them back.
             if isinstance(test_dataset, Dataset):
                 test_dataset.set_format(
@@ -161,6 +162,7 @@ class Seq2SeqTrainer(transformers.trainer_seq2seq.Seq2SeqTrainer):
 
             eval_preds = self._post_process_function(
                 test_examples, test_dataset, output.predictions, metric_key_prefix)
+        if run_metrics and eval_preds is not None:
             output.metrics.update(self.compute_metrics(eval_preds))
 
         output.metrics.update(speed_metrics(metric_key_prefix, start_time, len(test_dataset)))
