@@ -138,7 +138,8 @@ class Seq2SeqTrainer(transformers.trainer_seq2seq.Seq2SeqTrainer):
         start_time = time.time()
 
         # Temporarily disable metric computation, we will do it in the loop here.
-        compute_metrics = self.compute_metrics
+        requested_compute_metrics = compute_metrics
+        original_compute_metrics = self.compute_metrics
         self.compute_metrics = None
         try:
             output: PredictionOutput = self.evaluation_loop(
@@ -148,9 +149,13 @@ class Seq2SeqTrainer(transformers.trainer_seq2seq.Seq2SeqTrainer):
                 metric_key_prefix=metric_key_prefix,
             )
         finally:
-            self.compute_metrics = compute_metrics
+            self.compute_metrics = original_compute_metrics
 
-        run_metrics = self.compute_metrics is not None if compute_metrics is None else compute_metrics
+        run_metrics = (
+            self.compute_metrics is not None
+            if requested_compute_metrics is None
+            else requested_compute_metrics
+        )
         eval_preds = None
         if test_examples is not None and test_dataset is not None:
             # We might have removed columns from the dataset so we put them back.
